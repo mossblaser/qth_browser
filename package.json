@@ -16,16 +16,18 @@
   "author": "Jonathan Heathcote",
   "license": "MIT",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "jest": "^22.4.3",
     "qth": "github:mossblaser/qth.js",
     "redux": "^3.7.2",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "webpack": "^4.6.0"
   },
   "devDependencies": {
-    "babel": "^6.23.0",
-    "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.3",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-plugin-transform-object-rest-spread": "^6.26.0"
   }
 }

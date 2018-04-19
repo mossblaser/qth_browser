@@ -602,6 +602,13 @@ describe("asynchronous actions (with mocked qth)", () => {
       });
     });
     
+    test("handles non-existant directory", () => {
+      // Watch the root directory, never send the value (as if it was deleted)
+      // and unsubscribe and make sure nothing crashes.
+      store.dispatch(enterDirectory(""));
+      store.dispatch(leaveDirectory(""));
+    });
+    
     test("watching deeper directories", () => {
       // Watch a nested directory
       store.dispatch(enterDirectory("foo/bar/"));

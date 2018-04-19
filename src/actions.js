@@ -207,6 +207,8 @@ export const connect = url => (dispatch, getState) => {
       // however it could occur if callbacks from Qth are badly delayed).
       if (stateBefore.directories.hasOwnProperty(path) &&
           stateBefore.directories[path].refcount > 0) {
+        // NB: contents may become undefined if the directory is deleted
+        contents = contents || {};
         const contentsBefore = stateBefore.directories[path].contents || {};
         
         const propertiesBefore = new Set();
@@ -368,7 +370,7 @@ export const leaveDirectory = path => (dispatch, getState) => {
   
   // Unwatch any events/properties in this directory
   if (getRefcount(path, state.directories) == 1 && state.client) {
-    for (const [name, entries] of Object.entries(state.directories[path].contents)) {
+    for (const [name, entries] of Object.entries(state.directories[path].contents || {})) {
       if (containsEvent(entries)) {
         dispatch(unwatchEvent(`${path}${name}`));
       }
