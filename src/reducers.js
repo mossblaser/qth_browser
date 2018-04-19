@@ -151,7 +151,7 @@ const updateDirectory = (path, contents, oldDirectories) => {
     // Ignore if this wasn't requested, not worth going to the trouble of
     // caching the result since this shouldn't occur (since we never remove
     // paths).
-    return directories;
+    return oldDirectories;
   }
 };
 
