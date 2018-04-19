@@ -1,0 +1,31 @@
+{
+  "name": "qth-browser",
+  "version": "0.1.0",
+  "description": "A graphical, web-based browser for Qth.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "qth",
+    "mqtt",
+    "home",
+    "automation",
+    "graphical"
+  ],
+  "author": "Jonathan Heathcote",
+  "license": "MIT",
+  "dependencies": {
+    "jest": "^22.4.3",
+    "qth": "github:mossblaser/qth.js",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-jest": "^22.4.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
+  }
+}
