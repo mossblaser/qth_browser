@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: ["babel-polyfill", "./src/index.js"],
+  entry: ["babel-polyfill", "./src/index.jsx"],
   mode: "development",
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -16,6 +16,16 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: ['env'],
+          },
+        },
+      },
+      {
+        test: /\.jsx$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['env', 'react'],
           },
         },
       },
