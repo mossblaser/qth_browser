@@ -3,7 +3,7 @@ import ReduxThunk from "redux-thunk";
 
 import Client from "qth";
 
-import qth from "./reducer";
+import reducer from "../";
 import {
   connect,
   enterDirectory,
@@ -27,13 +27,13 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     beforeEach(() => {
       jest.clearAllMocks();
       
-      store = createStore(qth, applyMiddleware(ReduxThunk));
+      store = createStore(reducer, applyMiddleware(ReduxThunk));
       store.dispatch(connect("ws://example.com"));
-      client = store.getState().client;
+      client = store.getState().qth.client;
     });
     
     test("basic connection", () => {
-      const state = store.getState();
+      const state = store.getState().qth;
       
       // Should have created a real Qth client
       expect(state.client).toBe(Client.mock.instances[0]);
@@ -44,13 +44,13 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     });
     
     test("connection/disconnection event", () => {
-      expect(store.getState().connected).toBeFalsy();
+      expect(store.getState().qth.connected).toBeFalsy();
       
       client.callCallbacks("connect");
-      expect(store.getState().connected).toBeTruthy();
+      expect(store.getState().qth.connected).toBeTruthy();
       
       client.callCallbacks("offline");
-      expect(store.getState().connected).toBeFalsy();
+      expect(store.getState().qth.connected).toBeFalsy();
     });
     
     test("restoring subscriptions etc.", () => {
@@ -62,7 +62,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       store.dispatch(watchEvent("event"));
       store.dispatch(registerPath("reg", "EVENT-1:N", "Test event."));
       
-      const oldState = store.getState();
+      const oldState = store.getState().qth;
       
       // Reconnect (making sure the new client is inserted
       store.dispatch(connect("ws://example.com/2"));
@@ -70,7 +70,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       expect(Client).toHaveBeenCalledTimes(2);
       const oldClient = client;
       client = Client.mock.instances[1];
-      expect(store.getState().client).toBe(client);
+      expect(store.getState().qth.client).toBe(client);
       expect(oldClient.end).toHaveBeenCalledTimes(1);
       
       // Existing subscriptions should have been reestablished
@@ -91,7 +91,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       expect(client.unregister).not.toHaveBeenCalled();
       
       // No state change (beyond client object/hostname) should have occurred
-      expect(store.getState()).toEqual({
+      expect(store.getState().qth).toEqual({
         ...oldState,
         host: "ws://example.com/2",
         client,
@@ -106,16 +106,16 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     beforeEach(() => {
       jest.clearAllMocks();
       
-      store = createStore(qth, applyMiddleware(ReduxThunk));
+      store = createStore(reducer, applyMiddleware(ReduxThunk));
       store.dispatch(connect("ws://example.com"));
-      client = store.getState().client;
+      client = store.getState().qth.client;
       client.callCallbacks("connect");
     });
     
     test("correct property watching/unwatching", () => {
       // Watch the root directory
       store.dispatch(enterDirectory(""));
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: null, valid: false},
       });
       
@@ -125,7 +125,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       
       // Simulate a response and check it arrives
       client.watchProperty.mock.calls[0][1]("meta/ls/", {});
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: {}, valid: true},
       });
       
@@ -143,7 +143,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       expect(client.unwatchProperty.mock.calls[0][0]).toBe("meta/ls/");
       expect(client.unwatchProperty.mock.calls[0][1]).toBe(
         client.watchProperty.mock.calls[0][1]);
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 0, contents: {}, valid: false},
       });
     });
@@ -158,7 +158,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     test("watching deeper directories", () => {
       // Watch a nested directory
       store.dispatch(enterDirectory("foo/bar/"));
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: null, valid: false},
         "foo/": {refcount: 1, contents: null, valid: false},
         "foo/bar/": {refcount: 1, contents: null, valid: false},
@@ -172,19 +172,19 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       
       // Simulate a response and check each arrives seperately
       client.watchProperty.mock.calls[0][1]("meta/ls/", {});
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: {}, valid: true},
         "foo/": {refcount: 1, contents: null, valid: false},
         "foo/bar/": {refcount: 1, contents: null, valid: false},
       });
       client.watchProperty.mock.calls[1][1]("meta/ls/foo/", {});
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: {}, valid: true},
         "foo/": {refcount: 1, contents: {}, valid: true},
         "foo/bar/": {refcount: 1, contents: null, valid: false},
       });
       client.watchProperty.mock.calls[2][1]("meta/ls/foo/bar/", {});
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: {}, valid: true},
         "foo/": {refcount: 1, contents: {}, valid: true},
         "foo/bar/": {refcount: 1, contents: {}, valid: true},
@@ -204,7 +204,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       expect(client.unwatchProperty.mock.calls[2][1]).toBe(
         client.watchProperty.mock.calls[2][1]);
       
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 0, contents: {}, valid: false},
         "foo/": {refcount: 0, contents: {}, valid: false},
         "foo/bar/": {refcount: 0, contents: {}, valid: false},
@@ -213,7 +213,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     
     test("watching values within directories", () => {
       store.dispatch(enterDirectory("dir/"));
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: null, valid: false},
         "dir/": {refcount: 1, contents: null, valid: false},
       });
@@ -228,7 +228,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
           {behaviour: "PROPERTY-1:N", description: "A property."},
         ],
       });
-      expect(store.getState().directories).toEqual({
+      expect(store.getState().qth.directories).toEqual({
         "": {refcount: 1, contents: null, valid: false},
         "dir/": {
           refcount: 1,
@@ -246,11 +246,11 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       });
       
       // We'd also expect a number of value subscriptions to be created.
-      expect(store.getState().events).toEqual({
+      expect(store.getState().qth.events).toEqual({
         "dir/event": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 1, value: undefined, lastUpdate: null},
       });
-      expect(store.getState().properties).toEqual({
+      expect(store.getState().qth.properties).toEqual({
         "dir/property": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 1, value: undefined, lastUpdate: null},
       });
@@ -265,11 +265,11 @@ describe("asynchronous qth actions (with mocked qth)", () => {
           {behaviour: "PROPERTY-1:N", description: "A property."},
         ],
       });
-      expect(store.getState().events).toEqual({
+      expect(store.getState().qth.events).toEqual({
         "dir/event": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
-      expect(store.getState().properties).toEqual({
+      expect(store.getState().qth.properties).toEqual({
         "dir/property": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 1, value: undefined, lastUpdate: null},
       });
@@ -280,11 +280,11 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         "event": [{behaviour: "EVENT-1:N", description: "An event."}],
         "property": [{behaviour: "PROPERTY-1:N", description: "A property."}],
       });
-      expect(store.getState().events).toEqual({
+      expect(store.getState().qth.events).toEqual({
         "dir/event": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
-      expect(store.getState().properties).toEqual({
+      expect(store.getState().qth.properties).toEqual({
         "dir/property": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
@@ -297,12 +297,12 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         "property": [{behaviour: "PROPERTY-1:N", description: "A property."}],
         "event2": [{behaviour: "EVENT-1:N", description: "An event."}],
       });
-      expect(store.getState().events).toEqual({
+      expect(store.getState().qth.events).toEqual({
         "dir/event": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/event2": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
-      expect(store.getState().properties).toEqual({
+      expect(store.getState().qth.properties).toEqual({
         "dir/property": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
@@ -315,12 +315,12 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         "event2": [{behaviour: "EVENT-1:N", description: "An event."}],
         "property2": [{behaviour: "PROPERTY-1:N", description: "A property."}],
       });
-      expect(store.getState().events).toEqual({
+      expect(store.getState().qth.events).toEqual({
         "dir/event": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/event2": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
-      expect(store.getState().properties).toEqual({
+      expect(store.getState().qth.properties).toEqual({
         "dir/property": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/property2": {refcount: 1, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
@@ -328,12 +328,12 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       
       // Finally, on unsubscription, everything should get cleared up
       store.dispatch(leaveDirectory("dir/"));
-      expect(store.getState().events).toEqual({
+      expect(store.getState().qth.events).toEqual({
         "dir/event": {refcount: 0, value: undefined, lastUpdate: null},
         "dir/event2": {refcount: 0, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
       });
-      expect(store.getState().properties).toEqual({
+      expect(store.getState().qth.properties).toEqual({
         "dir/property": {refcount: 0, value: undefined, lastUpdate: null},
         "dir/property2": {refcount: 0, value: undefined, lastUpdate: null},
         "dir/both": {refcount: 0, value: undefined, lastUpdate: null},
@@ -348,9 +348,9 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     beforeEach(() => {
       jest.clearAllMocks();
       
-      store = createStore(qth, applyMiddleware(ReduxThunk));
+      store = createStore(reducer, applyMiddleware(ReduxThunk));
       store.dispatch(connect("ws://example.com"));
-      client = store.getState().client;
+      client = store.getState().qth.client;
       client.callCallbacks("connect");
     });
     
@@ -363,7 +363,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         store.dispatch(watchAction("foo"));
         
         // ...update the store
-        expect(store.getState()[name]).toEqual({
+        expect(store.getState().qth[name]).toEqual({
           "foo": {refcount: 1, value: undefined, lastUpdate: null},
         });
         
@@ -377,13 +377,13 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         
         // Calling the provided callback should result in a call
         client[`watch${nameCS}`].mock.calls[0][1]("foo", 123);
-        expect(store.getState()[name].foo.value).toBe(123);
-        expect(store.getState()[name].foo.lastUpdate).toBeGreaterThan(0);
+        expect(store.getState().qth[name].foo.value).toBe(123);
+        expect(store.getState().qth[name].foo.lastUpdate).toBeGreaterThan(0);
         
         // Unwatching shouldn't invalidate yet since refcount is non-zero
         store.dispatch(unwatchAction("foo"));
         expect(client[`unwatch${nameCS}`]).not.toHaveBeenCalled();
-        expect(store.getState()[name].foo.lastUpdate).toBeGreaterThan(0);
+        expect(store.getState().qth[name].foo.lastUpdate).toBeGreaterThan(0);
         
         // Unwatching again, however, should!
         store.dispatch(unwatchAction("foo"));
@@ -391,7 +391,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         expect(client[`unwatch${nameCS}`].mock.calls[0][0]).toBe("foo");
         expect(client[`unwatch${nameCS}`].mock.calls[0][1]).toBe(
           client[`watch${nameCS}`].mock.calls[0][1]);
-        expect(store.getState()[name].foo.lastUpdate).toBe(null);
+        expect(store.getState().qth[name].foo.lastUpdate).toBe(null);
       });
     }
   });
@@ -403,9 +403,9 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     beforeEach(() => {
       jest.clearAllMocks();
       
-      store = createStore(qth, applyMiddleware(ReduxThunk));
+      store = createStore(reducer, applyMiddleware(ReduxThunk));
       store.dispatch(connect("ws://example.com"));
-      client = store.getState().client;
+      client = store.getState().qth.client;
       client.callCallbacks("connect");
     });
     
@@ -422,7 +422,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         store.dispatch(action("foo"));
         
         // ...update the store
-        expect(store.getState().pendingActions).toEqual({
+        expect(store.getState().qth.pendingActions).toEqual({
           "foo": {pending: 1, lastValue: expectedValue, lastAction: type},
         });
         
@@ -432,7 +432,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
         
         // Now when the promise resolves, the pending value should disappear
         await promise;
-        expect(store.getState().pendingActions).toEqual({});
+        expect(store.getState().qth.pendingActions).toEqual({});
       });
     }
   });
@@ -444,9 +444,9 @@ describe("asynchronous qth actions (with mocked qth)", () => {
     beforeEach(() => {
       jest.clearAllMocks();
       
-      store = createStore(qth, applyMiddleware(ReduxThunk));
+      store = createStore(reducer, applyMiddleware(ReduxThunk));
       store.dispatch(connect("ws://example.com"));
-      client = store.getState().client;
+      client = store.getState().qth.client;
       client.callCallbacks("connect");
     });
     
@@ -456,7 +456,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       expect(client.register).toHaveBeenCalledTimes(1);
       expect(client.register).toHaveBeenLastCalledWith(
         "foo", "EVENT-1:N", "Test event.", {});
-      expect(store.getState().registrations).toEqual({
+      expect(store.getState().qth.registrations).toEqual({
         foo: {behaviour: "EVENT-1:N", description: "Test event."}
       });
       
@@ -466,7 +466,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       expect(client.register).toHaveBeenCalledTimes(2);
       expect(client.register).toHaveBeenLastCalledWith(
         "foo", "PROPERTY-1:N", "Test property.", {deleteOnUnregister: true});
-      expect(store.getState().registrations).toEqual({
+      expect(store.getState().qth.registrations).toEqual({
         foo: {
           behaviour: "PROPERTY-1:N",
           description: "Test property.",
@@ -478,7 +478,7 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       store.dispatch(registerPath("bar", "EVENT-1:N", "Test event."));
       expect(client.register).toHaveBeenCalledTimes(3);
       expect(client.register).toHaveBeenLastCalledWith("bar", "EVENT-1:N", "Test event.", {});
-      expect(store.getState().registrations).toEqual({
+      expect(store.getState().qth.registrations).toEqual({
         foo: {
           behaviour: "PROPERTY-1:N",
           description: "Test property.",
@@ -491,14 +491,14 @@ describe("asynchronous qth actions (with mocked qth)", () => {
       store.dispatch(unregisterPath("foo"));
       expect(client.unregister).toHaveBeenCalledTimes(1);
       expect(client.unregister).toHaveBeenLastCalledWith("foo");
-      expect(store.getState().registrations).toEqual({
+      expect(store.getState().qth.registrations).toEqual({
         bar: {behaviour: "EVENT-1:N", description: "Test event."},
       });
       
       store.dispatch(unregisterPath("bar"));
       expect(client.unregister).toHaveBeenCalledTimes(2);
       expect(client.unregister).toHaveBeenLastCalledWith("bar");
-      expect(store.getState().registrations).toEqual({});
+      expect(store.getState().qth.registrations).toEqual({});
     });
   });
 });

@@ -53,7 +53,7 @@ export const connect = url => (dispatch, getState) => {
     // XXX: As a dirty hack we store them in the client object (so that we have
     // somewhere to keep them).
     client.$$onDirectoryUpdate = (metaLsPath, contents) => {
-      const stateBefore = getState();
+      const stateBefore = getState().qth;
       
       const path = metaLsPath.slice("meta/ls/".length);
       dispatch(updateDirectory(path, contents));
@@ -121,7 +121,7 @@ export const connect = url => (dispatch, getState) => {
     };
     
     // Reinstate subscriptions for watching directories
-    const state = getState();
+    const state = getState().qth;
     for (const [path, {refcount}] of Object.entries(state.directories)) {
       if (refcount > 0) {
         client.watchProperty(`meta/ls/${path}`, client.$$onDirectoryUpdate);
@@ -148,7 +148,7 @@ export const connect = url => (dispatch, getState) => {
   };
   
   // Disconnect old client (if present) before setting up the new one
-  const oldClient = getState().client;
+  const oldClient = getState().qth.client;
   if (oldClient) {
     oldClient.end(true, setupNewClient);
   } else {
@@ -199,7 +199,7 @@ function* allSubdirectories(path) {
  * all values can be displayed once known.
  */
 export const enterDirectory = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   
   for (const subpath of allSubdirectories(path)) {
     dispatch(enteringDirectory(subpath));
@@ -214,7 +214,7 @@ export const enterDirectory = path => (dispatch, getState) => {
  * values).
  */
 export const leaveDirectory = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   
   // Unwatch directories
   for (const subpath of allSubdirectories(path)) {
@@ -242,7 +242,7 @@ export const leaveDirectory = path => (dispatch, getState) => {
  * 'properties'.
  */
 export const watchProperty = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   dispatch(incrementWatchPropertyRefcount(path));
   
   if (getRefcount(path, state.properties) == 0 && state.client) {
@@ -255,7 +255,7 @@ export const watchProperty = path => (dispatch, getState) => {
  * entry in 'properties'.
  */
 export const unwatchProperty = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   dispatch(decrementWatchPropertyRefcount(path));
   
   if (getRefcount(path, state.properties) == 1 && state.client) {
@@ -268,7 +268,7 @@ export const unwatchProperty = path => (dispatch, getState) => {
  * 'events'.
  */
 export const watchEvent = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   dispatch(incrementWatchEventRefcount(path));
   if (getRefcount(path, state.events) == 0 && state.client) {
     state.client.watchEvent(path, state.client.$$onEventUpdate);
@@ -280,7 +280,7 @@ export const watchEvent = path => (dispatch, getState) => {
  * entry in 'events'.
  */
 export const unwatchEvent = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   dispatch(decrementWatchEventRefcount(path));
   
   if (getRefcount(path, state.events) == 1 && state.client) {
@@ -293,7 +293,7 @@ export const unwatchEvent = path => (dispatch, getState) => {
  * value. Status will be reported in 'pendingActions.send'.
  */
 export const sendEvent = (path, value=null) => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   if (state.client) {
     dispatch(sendingEvent(path, value));
     state.client.sendEvent(path, value)
@@ -307,7 +307,7 @@ export const sendEvent = (path, value=null) => (dispatch, getState) => {
  * value. Status will be reported in 'pendingActions.set'.
  */
 export const setProperty = (path, value) => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   if (state.client) {
     dispatch(settingProperty(path, value));
     state.client.setProperty(path, value)
@@ -321,7 +321,7 @@ export const setProperty = (path, value) => (dispatch, getState) => {
  * 'pendingActions.delete'.
  */
 export const deleteProperty = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   if (state.client) {
     dispatch(deletingProperty(path));
     state.client.deleteProperty(path)
@@ -335,7 +335,7 @@ export const deleteProperty = path => (dispatch, getState) => {
  * and update the registration entry in 'registrations'.
  */
 export const registerPath = (path, behaviour, description, options={}) => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   dispatch(registeringPath(path, behaviour, description, options));
   if (state.client) {
     state.client.register(path, behaviour, description, options);
@@ -347,7 +347,7 @@ export const registerPath = (path, behaviour, description, options={}) => (dispa
  * 'registrations'.
  */
 export const unregisterPath = path => (dispatch, getState) => {
-  const state = getState();
+  const state = getState().qth;
   dispatch(unregisteringPath(path));
   if (state.client) {
     state.client.unregister(path);
