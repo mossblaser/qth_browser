@@ -10,7 +10,9 @@ import PropTypes from "prop-types";
 
 import "./QthValue.less";
 
-/** An app bar at the top of the display */
+/**
+ * An inline single-line value display component.
+ */
 const QthValue = ({value, isEvent, lastUpdate}) => {
 	let className;
 	if (value === undefined) {

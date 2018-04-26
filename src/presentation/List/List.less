@@ -71,13 +71,16 @@
 .ListItemLabel {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   justify-content: center;
   
   flex-grow: 1;
+  flex-shrink: 1;
   
   padding-top: 8px;
   padding-bottom: 8px;
+	
+	min-width: 100px;
 }
 
 .ListItemLabelPrimary {

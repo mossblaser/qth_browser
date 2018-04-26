@@ -2,8 +2,6 @@
 
 .QthValue {
 	font-family: monospace;
-	white-space: pre;
-	word-break: break-all;
 }
 
 .QthValue-container {
@@ -11,7 +9,9 @@
 }
 
 .QthValue-container .QthValue-text {
+	overflow: hidden;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 	
 	&.property-initial-appear,
 	&.property-initial-enter {
