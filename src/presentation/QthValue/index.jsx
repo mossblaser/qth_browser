@@ -92,12 +92,19 @@ class QthPropertyValue extends Component {
 	render() {
 		const {value, lastUpdate} = this.props;
 		
-		const text = (value === undefined) ? "(deleted)" : JSON.stringify(value);
+		// Only show the value if it is both present and we have actually received
+		// a value. (i.e. don't show cached values).
+		
+		// TODO: In the future we might want to show the cached values while
+		// loading...
+		const text = (value === undefined || !lastUpdate)
+			? "(deleted)"
+			: JSON.stringify(value);
 		
 		// If a no value has appeared yet don't immediatley show it as '(deleted)',
 		// use CSS to add a delay before this appears so that it doesn't
 		// flash up before the value arrived.
-		const delayAnimation = (value === undefined) && !lastUpdate;
+		const delayAnimation = !lastUpdate;
 		
 		// If a value arrives in the first 'changeAnimationDuration' ms after this
 		// component is created, show the value immediately without any
