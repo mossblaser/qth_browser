@@ -1,31 +1,17 @@
 @import "../css/definitions.less";
 
 .QthValue {
+	/* As code */
 	font-family: monospace;
-}
-
-.QthValue-container {
-	position: relative;
-}
-
-.QthValue-container .QthValue-text {
-	overflow: hidden;
-	text-overflow: ellipsis;
 	white-space: pre;
 	
-	&.property-initial-appear,
-	&.property-initial-enter {
-		opacity: 0.0;
-	}
-	&.property-initial-appear-active,
-	&.property-initial-enter-active {
-		opacity: 1.0;
-		
-		transition: opacity @qth-value-fade-duration ease-out;
-		transition-delay: @qth-value-initial-value-delay;
-	}
-	
-	/* A slide-across underline animation on change (except for deleting). */
+	/* Truncate to fit one line */
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.QthValue-change-animation {
+	/* Flying underline */
 	&:before {
 		content: "";
 		
@@ -39,124 +25,119 @@
 		
 		background-color: @primary-colour;
 	}
-	&.event-appear-active,
-	&.event-enter-active,
-	&.property-appear-active,
-	&.property-enter-active {
-		&:before {
-			width: 100%;
-			transition: width @qth-value-change-duration ease-in;
-		}
+	
+	&.QthValue-change-animation-enter-active:before {
+		width: 100%;
+		transition: width @qth-value-change-duration ease-in;
 	}
-	&.event-appear-done,
-	&.event-enter-done,
-	&.property-appear-done,
-	&.property-enter-done {
-		&:before {
-			left: auto;
-			right: 0;
-			width: 0%;
-			transition: width @qth-value-change-duration ease-out;
-		}
+	&.QthValue-change-animation-enter-done:before {
+		left: auto;
+		right: 0;
+		width: 0%;
+		transition: width @qth-value-change-duration ease-out;
 	}
 	
-	/* 'Current' event values should fade after a while */
-	&.event-appear-done,
-	&.event-enter-done {
-		opacity: 0;
-		transition: opacity @qth-event-fade-duration;
-	}
-	
-	/* Previous values disappear immediately */
-	&.event-exit-active,
-	&.property-exit-active,
-	&.property-deleted-exit-active,
-	&.property-initial-exit-active {
+	/* Hide old value */
+	&.QthValue-change-animation-exit-active {
 		display: none;
 	}
 }
 
-/* Disable animations for value changes immediately after value is displayed
- * (e.g. for initial display of a property). */
-.QthValue-container.disable-animation .QthValue-text {
-	/* XXX: This also disables the animation for events which happen to fire
-	 * during first few ms of display, not just poperties... */
-	&:before {
-		display: none;
-	}
-}
 
-.QthValue-container.deleting .QthValue-text {
-	/* When deleting, old values are crossed out first */
-	&.property-appear,
-	&.property-enter,
-	&.property-deleted-appear,
-	&.property-deleted-enter {
+.QthEventValue {
+	.QthValue;
+	
+	/* Add animation for new values appearing. */
+	.QthValue-change-animation;
+	
+	/* Gradually fade out events */
+	&.QthValue-change-animation-enter-done {
 		opacity: 0.0;
+		transition: opacity @qth-event-fade-duration ease-out;
 	}
-	
-	&.property-appear-active,
-	&.property-enter-active,
-	&.property-deleted-appear-active,
-	&.property-deleted-enter-active {
-		opacity: 1.0;
-		transition: opacity @qth-value-fade-duration;
-		transition-delay: @qth-value-delete-duration;
+}
+
+
+/* Property change: normal animation. */
+.QthPropertyValue-normal-animation {
+	.QthPropertyValue {
+		.QthValue;
+		
+		.QthValue-change-animation;
 	}
+}
+
+/* Property change: not animated. */
+.QthPropertyValue-no-animation {
+	.QthPropertyValue {
+		.QthValue;
+		
+		&.QthValue-change-animation-exit-active {
+			display: none;
+		}
+	}
+}
+
+/* Give property chance to load before showing '(deleted)'. */
+.QthPropertyValue-delay-animation {
+	.QthPropertyValue {
+		.QthValue;
+		
+		/* NB: This animation is only used on initial creation so the 'enter' and
+		 * 'exit' bits here are only here for defensive programming reasons...
+		 */
+		
+		&.QthValue-change-animation-enter-active,
+		&.QthValue-change-animation-appear-active {
+			opacity: 0.0;
+		}
+		&.QthValue-change-animation-enter-done,
+		&.QthValue-change-animation-appear-done {
+			opacity: 1.0;
+			transition: opacity @qth-value-change-duration;
+			transition-delay: @qth-value-change-duration;
+		}
+		
+		&.QthValue-change-animation-exit-active {
+			display: none;
+		}
+	}
+}
+
+/* Animate deletion of a property. */
+.QthPropertyValue-delete-animation {
+	position: relative;
 	
-	&.event-exit,
-	&.property-exit,
-	&.property-initial-exit,
-	&.property-deleted-exit,
-	&.event-exit-active,
-	&.property-exit-active,
-	&.property-deleted-exit-active,
-	&.property-initial-exit-active {
-		/* Keep the old value around */
-		display: block;
+	.QthPropertyValue {
+		.QthValue;
 		
-		/* New value will keep the container the right size. */
-		position: absolute;
-		top: 0;
-		left: 0;
+		&.QthValue-change-animation-enter-active {
+			/* New value (i.e. '(deleted)') hides in waiting for deletion animation */
+			opacity: 0.0;
+		}
+		&.QthValue-change-animation-enter-done {
+			/* After the old value is gone fade in the '(deleted)' message. The
+			 * additional delay just makes the break cleaner.
+			 */
+			opacity: 1.0;
+			transition: opacity @qth-value-change-duration;
+			transition-delay: @qth-value-change-duration;
+		}
 		
-		/* Cross out */
-		&:before {
-			content: "";
-			
-			display: block;
+		&.QthValue-change-animation-exit,
+		&.QthValue-change-animation-exit-active {
+			/* The new value will appear 'on top' so place this one directly
+			 * underneath. */
 			position: absolute;
-			
-			height: 1px;
-			
-			top: 50%;
+			top: 0;
 			left: 0;
+			right: 0;
 			
-			background-color: black;
-		}
-	}
-	
-	&.event-exit,
-	&.property-exit,
-	&.property-deleted-exit,
-	&.property-initial-exit {
-		opacity: 1.0;
-		
-		&:before {
-			width: 0%;
-		}
-	}
-	
-	&.event-exit-active,
-	&.property-exit-active,
-	&.property-deleted-exit-active,
-	&.property-initial-exit-active {
-		opacity: 0.0;
-		transition: opacity @qth-value-delete-duration ease-in;
-		
-		&:before {
-			width: 100%;
-			transition: width @qth-value-delete-duration ease-out;
+			/* Cross-out the old value */
+			text-decoration: line-through;
+			
+			opacity: 0.0;
+			transition: opacity @qth-value-change-duration ease-in;
 		}
 	}
 }

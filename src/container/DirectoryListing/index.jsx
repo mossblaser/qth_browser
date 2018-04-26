@@ -14,7 +14,7 @@ import {
 	ListItemLabelSecondary
 } from "../../presentation/List/index.jsx";
 
-import QthValue from "../../presentation/QthValue/index.jsx";
+import {QthEventValue, QthPropertyValue} from "../../presentation/QthValue/index.jsx";
 
 import MdNavigateNext from "react-icons/lib/md/navigate-next";
 import MdFolder from "react-icons/lib/md/folder";
@@ -80,17 +80,15 @@ class DirectoryListing extends Component {
 			let valueComponent;
 			if (isProperty) {
 				icon = "P";
-				valueComponent = <QthValue
+				valueComponent = <QthPropertyValue
 					value={value}
 					lastUpdate={valueLastUpdate}
-					isEvent={false}
 				/>;
 			} else if (isEvent) {
 				icon = "E";
-				valueComponent = <QthValue
+				valueComponent = <QthEventValue
 					value={value}
 					lastUpdate={valueLastUpdate}
-					isEvent={true}
 				/>;
 			} else if (isDirectory) {
 				icon = <MdFolder size={24} />;

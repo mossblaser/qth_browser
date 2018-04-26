@@ -10,83 +10,140 @@ import PropTypes from "prop-types";
 
 import "./QthValue.less";
 
+// Duration of value changed animation (ms) 
+// (Same as LESS: @qth-value-change-duration)
+const changeAnimationDuration = 200;
+
 /**
- * Displays a live Qth value in a single line of text. This value animates upon
- * changes.
+ * Displays a live Qth event's value in a single line of text.
+ *
+ * Adds a green dashing line animation to the nearest 'position: relative'
+ * parent div on change. Event values fade away after a few seconds.
  *
  * Props:
  * * value: The JSON-serialisable value to be displayed (or undefined if no
  *   value available).
- * * isEvent: True if the value is a Qth Event (false if a Property).
- * * lastUpdate: The time (in ms since the epoch) since the value last changed.
+ * * lastUpdate: The time (in ms since the epoch) when the event last occurred
+ *   or undefined if not known.
  */
-const QthValue = ({value, isEvent, lastUpdate}) => {
-	// The text to display for the value
-	let valueText = JSON.stringify(value) || " ";
-	
-	// The duraiton of the animation to play for the value change (ms) 
-	let transitionDuration = 200; // @qth-value-change-duration
-	
-	// The animations used are different for different kinds of value or change.
-	// This class is used by the CSS to control which animation is used.
-	let transitionClass = isEvent ? "event" : "property";
-	
-	// Indicate that a previous value was deleted (i.e. the value has changed to
-	// the deleting state).
-	let isDeleting = false;
-	
-	// Display deleted properties explicitly
-	if (!isEvent && value === undefined) {
-		valueText = "(deleted)";
-		if (lastUpdate) {
-			// If we have a lastUpdate then this value was explicitly deleted
-			isDeleting = true;
-			transitionClass = "property-deleted";
-			transitionDuration += 200; // + @qth-value-delete-duration
-		} else {
-			// If no lastValue is available this property value is just not available
-			// yet. Since this will briefly be the case when we're just subscribing
-			// to the value we have a distinct animation for this. This animation
-			// hides the message briefly before showing the '(deleted)' message. If
-			// the value subsequently arrives, the '(deleted)' message is never
-			// displayed.
-			transitionClass = "property-initial";
-			transitionDuration += 500; // + @qth-value-initial-delay
-		}
+class QthEventValue extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			creationTime: (new Date()).getTime(),
+		};
 	}
 	
-	// The animations in use are a little complicated. The animations are as
-	// follows:
-	//
-	// * Value changed: Previous value is immediately replaced by new value and a
-	//   green flash of underline flies along the bottom of the new value.
-	// * Events: After an event is recieved it fades away to nothing over the
-	//   next few seconds.
-	// * Properties: Properties persist and don't fade away.
-	// * Property deleted: The old value is crossed out and the '(deleted)'
-	//   message fades in in-front of it.
-	return <div className="QthValue">
-		<Transition timeout={500} in={true} appear>{
-			animationEnableStatus => (
-				<TransitionGroup timeout={transitionDuration}
-					               appear
-				                 className={"QthValue-container"
-				                            + (isDeleting ? " deleting" : "")
-				                            + (animationEnableStatus==="entering" ? " disable-animation" : "")}>
-					<CSSTransition timeout={transitionDuration}
-					               classNames={transitionClass}
-					               key={lastUpdate||0}>
-						<div className="QthValue-text">{valueText}</div>
-					</CSSTransition>
-				</TransitionGroup>
-			)
-		}</Transition>
-	</div>;
-}
-QthValue.propTypes = {
+	render() {
+		const {value, lastUpdate} = this.props;
+		
+		let text = JSON.stringify(value);
+		if (value === undefined) {
+			text = " ";
+		}
+		if (lastUpdate === undefined || lastUpdate < this.state.creationTime) {
+			// Stale value, don't show it
+			text = " ";
+		}
+		
+		// The 'lastUpdate' key ensures that this div is replaced whenever the
+		// event occurs thus ensuring the fade-out animation is replayed.
+		return <TransitionGroup timeout={changeAnimationDuration}>
+			<CSSTransition classNames="QthValue-change-animation"
+			               timeout={changeAnimationDuration}
+			               key={this.props.lastUpdate||0}>
+				<div className="QthEventValue">
+					{text}
+				</div>
+			</CSSTransition>
+		</TransitionGroup>;
+	}
+};
+QthEventValue.propTypes = {
 	value: PropTypes.any,
 	lastUpdate: PropTypes.number,
-	isEvent: PropTypes.bool,
 };
 
-export default QthValue;
+/**
+ * Displays a live Qth property's value in a single line of text.
+ *
+ * Adds a green dashing line animation to the nearest 'position: relative'
+ * parent div on change. When values are deleted the old value is 'crossed out'
+ * before a '(deleted)' message is shown.
+ *
+ * If no value is provided within a short time after creation a '(deleted)'
+ * message is shown. If a value is provided within this period, the value is
+ * shown with no transition or animation.
+ *
+ * Props:
+ * * value: The JSON-serialisable value to be displayed (or undefined if no
+ *   value available).
+ * * lastUpdate: The time (in ms since the epoch) when the property last
+ *   changed or undefined if no value reports have been received.
+ */
+class QthPropertyValue extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			creationTime: (new Date()).getTime(),
+		};
+	}
+	
+	render() {
+		const {value, lastUpdate} = this.props;
+		
+		const text = (value === undefined) ? "(deleted)" : JSON.stringify(value);
+		
+		// If a no value has appeared yet don't immediatley show it as '(deleted)',
+		// use CSS to add a delay before this appears so that it doesn't
+		// flash up before the value arrived.
+		const delayAnimation = (value === undefined) && !lastUpdate;
+		
+		// If a value arrives in the first 'changeAnimationDuration' ms after this
+		// component is created, show the value immediately without any
+		// animation. This value probably only arrived late because the
+		// subscription was still being set up.
+		const noAnimation = (
+			lastUpdate &&
+			((lastUpdate - this.state.creationTime) < changeAnimationDuration)
+		);
+		
+		// Is the value is being explicitly deleted?
+		const deleteAnimation = (value === undefined) && !!lastUpdate;
+		
+		// Because we need to modify the animation of a div which TransitionGroup
+		// has previously copied during deletion (to animate crossing it out) and
+		// we can't do that, instead we add a class to the container.
+		let containerClassName = "";
+		if (delayAnimation) {
+			containerClassName = "QthPropertyValue-delay-animation";
+		} else if (noAnimation) {
+			containerClassName = "QthPropertyValue-no-animation";
+		} else if (deleteAnimation) {
+			containerClassName = "QthPropertyValue-delete-animation";
+		} else {
+			containerClassName = "QthPropertyValue-normal-animation";
+		}
+		
+		// The 'lastUpdate' key ensures that this div is replaced whenever the
+		// event occurs thus ensuring the fade-out animation is replayed.
+		return <TransitionGroup timeout={changeAnimationDuration}
+		                        className={containerClassName}
+		                        appear>
+			<CSSTransition classNames="QthValue-change-animation"
+			               timeout={changeAnimationDuration}
+			               key={this.props.lastUpdate||0}>
+				<div className="QthPropertyValue">
+					{text}
+				</div>
+			</CSSTransition>
+		</TransitionGroup>;
+	}
+};
+QthPropertyValue.propTypes = {
+	value: PropTypes.any,
+	lastUpdate: PropTypes.number,
+};
+
+
+export {QthEventValue, QthPropertyValue};
