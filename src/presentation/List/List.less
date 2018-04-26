@@ -1,0 +1,90 @@
+@import "../css/definitions.less";
+@import "../css/click-animation.less";
+
+
+.List {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.ListItem {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  
+  padding-left: @spacing;
+  padding-right: @spacing;
+  
+  border-bottom-color: #eee;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  
+  cursor: default;
+  user-select: none;
+  
+  overflow: hidden;
+  
+  .click-animation;
+  
+  &:focus {
+    outline: none;
+    background-color: #f0f0f0;
+  }
+}
+
+.ListItemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  padding: (@touch-size - @icon-size) / 2;
+  
+  min-width: @icon-size;
+  min-height: @icon-size;
+  
+  .click-animation;
+  
+  &:focus {
+    outline: none;
+    background-color: #f0f0f0;
+  }
+  
+  &:first-child {
+    /* Counteract left-hand padding */
+    margin-left: -(@touch-size - @icon-size) / 2;
+    
+    margin-right:
+      72px  /* Left-of-screen to first text spacing from Material Design */
+      - @touch-size /* Size of this icon + padding */
+      + ((@touch-size - @icon-size) / 2)  /* Account for our negative margin */
+      - @spacing /* Left-of-screen spacing */
+      ;
+  }
+  
+  &:last-child {
+    margin-right: -12px;
+  }
+}
+
+.ListItemLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  
+  flex-grow: 1;
+  
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.ListItemLabelPrimary {
+}
+
+.ListItemLabelSecondary {
+  opacity: 0.5;
+  font-size: 12px;
+}
+

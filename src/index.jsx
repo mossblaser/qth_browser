@@ -1,37 +1,37 @@
-import {createStore, applyMiddleware} from "redux";
-import ReduxThunk from "redux-thunk";
-
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
-import {Provider, connect} from "react-redux";
+import {createStore, applyMiddleware} from "redux";
+import ReduxThunk from "redux-thunk";
+import {Provider} from "react-redux";
+import reducer, {qth_actions} from "./store/index.js";
 
-import * as actions from "./actions";
+import "./index.less";
 
-import qth from "./reducers";
+import {AppBar, AppBarElement} from "./presentation/AppBar/index.jsx";
+import DirectoryListing from "./container/DirectoryListing/index.jsx";
+
+import MdMenu from "react-icons/lib/md/menu";
 
 
-const store = createStore(qth, applyMiddleware(ReduxThunk));
-
-class Root extends Component {
-	constructor(props) {
-		super(props);
-	}
-	
-	render() {
-		return <div onClick={this.props.onClick}>
-			Hello! Connected: {JSON.stringify(this.props.connected)}
-		</div>;
-	}
+const Root = ({}) => {
+	return <div className="Root">
+		<AppBar>
+			<AppBarElement>
+				<MdMenu size={24} />
+			</AppBarElement>
+			<AppBarElement>
+				meta/clients/
+			</AppBarElement>
+		</AppBar>
+		
+		<DirectoryListing path="" />
+	</div>;
 }
-Root = connect(
-	state => ({
-		connected: state.connected,
-	}),
-	dispatch => ({
-		onClick: () => dispatch(actions.connect("ws://localhost:8080")),
-	}),
-)(Root);
+
+
+const store = createStore(reducer, applyMiddleware(ReduxThunk));
+store.dispatch(qth_actions.connect("ws://localhost:8080/"));
 
 ReactDOM.render(
 	<Provider store={store}>

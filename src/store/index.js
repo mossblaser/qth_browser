@@ -8,4 +8,4 @@ const reducer = combineReducers({
 });
 
 export default reducer;
-export {qth};
+export {qth_actions};

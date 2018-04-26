@@ -1,0 +1,31 @@
+@import "../css/definitions.less";
+
+.AppBar {
+  background-color: @primary-colour;
+  
+  flex-grow: 0;
+  flex-shrink: 0;
+  
+  min-height: @touch-size;
+  
+  font-size: 20px;
+  font-weight: medium;
+  
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.AppBarElement {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  
+  padding-left: @spacing;
+  padding-right: @spacing;
+}
+
