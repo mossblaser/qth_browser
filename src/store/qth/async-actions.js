@@ -57,61 +57,6 @@ export const connect = url => (dispatch, getState) => {
       
       const path = metaLsPath.slice("meta/ls/".length);
       dispatch(updateDirectory(path, contents));
-      
-      // Update value watches (NB: this if statement should never be false
-      // since updates shouldn't be arriving for non-watched directories
-      // however it could occur if callbacks from Qth are badly delayed).
-      if (stateBefore.directories.hasOwnProperty(path) &&
-          stateBefore.directories[path].refcount > 0) {
-        // NB: contents may become undefined if the directory is deleted
-        contents = contents || {};
-        const contentsBefore = stateBefore.directories[path].contents || {};
-        
-        const propertiesBefore = new Set();
-        const eventsBefore = new Set();
-        for (const [name, entries] of Object.entries(contentsBefore)) {
-          if (containsEvent(entries)) {
-            eventsBefore.add(name);
-          }
-          if (containsProperty(entries)) {
-            propertiesBefore.add(name);
-          }
-        }
-        const propertiesNow = new Set();
-        const eventsNow = new Set();
-        for (const [name, entries] of Object.entries(contents)) {
-          if (containsEvent(entries)) {
-            eventsNow.add(name);
-          }
-          if (containsProperty(entries)) {
-            propertiesNow.add(name);
-          }
-        }
-        
-        // New entries
-        for (const name of eventsNow) {
-          if (!eventsBefore.has(name)) {
-            dispatch(watchEvent(`${path}${name}`));
-          }
-        }
-        for (const name of propertiesNow) {
-          if (!propertiesBefore.has(name)) {
-            dispatch(watchProperty(`${path}${name}`));
-          }
-        }
-        
-        // Removed entries
-        for (const name of eventsBefore) {
-          if (!eventsNow.has(name)) {
-            dispatch(unwatchEvent(`${path}${name}`));
-          }
-        }
-        for (const name of propertiesBefore) {
-          if (!propertiesNow.has(name)) {
-            dispatch(unwatchProperty(`${path}${name}`));
-          }
-        }
-      }
     };
     client.$$onEventUpdate = (path, value) => {
       dispatch(updateEvent(path, value));
@@ -190,13 +135,8 @@ function* allSubdirectories(path) {
 /**
  * Start monitoring a given directory.
  *
- * This actually subscribes to potentially a large number of endpoints.
- * Firstly, it subscribes to the directory and all parent directories (updating
- * the 'directories' dictionary).  Secondly it also subscribes to all values
- * within that directory. These value subscriptions appear in 'events' and
- * 'properties' accordingly. Using this collection of subscriptions the full
- * directory tree up to the provided directory can be validated. Additionally,
- * all values can be displayed once known.
+ * This actually subscribes to the directory and all parent directories (updating
+ * the 'directories' dictionary).
  */
 export const enterDirectory = path => (dispatch, getState) => {
   const state = getState().qth;
@@ -210,8 +150,7 @@ export const enterDirectory = path => (dispatch, getState) => {
 };
 
 /**
- * Stop monitoring a given directory (and all of its parent directories and
- * values).
+ * Stop monitoring a given directory (and all of its parent directories).
  */
 export const leaveDirectory = path => (dispatch, getState) => {
   const state = getState().qth;
@@ -221,18 +160,6 @@ export const leaveDirectory = path => (dispatch, getState) => {
     dispatch(leavingDirectory(subpath));
     if (getRefcount(subpath, state.directories) == 1 && state.client) {
       state.client.unwatchProperty(`meta/ls/${subpath}`, state.client.$$onDirectoryUpdate);
-    }
-  }
-  
-  // Unwatch any events/properties in this directory
-  if (getRefcount(path, state.directories) == 1 && state.client) {
-    for (const [name, entries] of Object.entries(state.directories[path].contents || {})) {
-      if (containsEvent(entries)) {
-        dispatch(unwatchEvent(`${path}${name}`));
-      }
-      if (containsProperty(entries)) {
-        dispatch(unwatchProperty(`${path}${name}`));
-      }
     }
   }
 };

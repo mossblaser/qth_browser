@@ -11,8 +11,8 @@ export const List = ({children}) => (
 );
 
 /** An item in a List. */
-export const ListItem = ({children}) => (
-	<div className="ListItem" tabIndex={0}>
+export const ListItem = ({children, tooltip}) => (
+	<div className="ListItem" tabIndex={0} title={tooltip}>
 		{children}
 	</div>
 );

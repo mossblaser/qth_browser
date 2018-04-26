@@ -20,6 +20,124 @@ import MdNavigateNext from "react-icons/lib/md/navigate-next";
 import MdFolder from "react-icons/lib/md/folder";
 
 
+class DirectoryEntry extends Component {
+	componentDidMount() {
+		if (this.props.isProperty) {
+			this.props.watchProperty(this.props.path);
+		} else if (this.props.isEvent) {
+			this.props.watchEvent(this.props.path);
+		}
+	}
+	componentWillUnmount() {
+		if (this.props.isProperty) {
+			this.props.unwatchProperty(this.props.path);
+		} else if (this.props.isEvent) {
+			this.props.unwatchEvent(this.props.path);
+		}
+	}
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.path !== this.props.path ||
+		    nextProps.isProperty !== this.props.isProperty ||
+		    nextProps.isEvent !== this.props.isEvent) {
+			// Start new watch
+			if (nextProps.isProperty) {
+				this.props.watchProperty(nextProps.path);
+			} else if (nextProps.isEvent) {
+				this.props.watchEvent(nextProps.path);
+			}
+			
+			// Remove old watch
+			if (this.props.isProperty) {
+				this.props.unwatchProperty(this.props.path);
+			} else if (this.props.isEvent) {
+				this.props.unwatchEvent(this.props.path);
+			}
+		}
+	}
+	
+	render() {
+		const {path, isProperty, isEvent, isDirectory, description} = this.props;
+		let {name} = this.props;
+		
+		// Get the requested value
+		let entry = {};
+		if (isProperty) {
+			entry = this.props.properties[path];
+		} else if (isEvent) {
+			entry = this.props.events[path];
+		}
+		let {value, lastUpdate} = entry || {};
+		
+		// Choose an icon
+		let icon = "?";
+		if (isProperty) {
+			icon = "P";
+		} else if (isEvent) {
+			icon = "E";
+		} else if (isDirectory) {
+			icon = <MdFolder size={24} />;
+		}
+		
+		// Add a trailing slash to the name if this is a directory
+		if (isDirectory) {
+			const className = (isProperty || isEvent)
+				? "trailing-slash-feint"
+				: "trailing-slash";
+			name = <span>
+				{name}<span className={className}>/</span>
+			</span>;
+		}
+		
+		// Format the value (if present)
+		if (isProperty) {
+			value = <QthPropertyValue value={value} lastUpdate={lastUpdate} />;
+		} else if (isEvent) {
+			value = <QthEventValue value={value} lastUpdate={lastUpdate} />;
+		} else {
+			value = null;
+		}
+		
+		// Add 'enter' directory button
+		let directoryButton = null;
+		if (isDirectory) {
+			directoryButton = <ListItemIcon>
+				<MdNavigateNext size={24}/>
+			</ListItemIcon>;
+		}
+		
+		return <ListItem tooltip={description}>
+			<ListItemIcon>{icon}</ListItemIcon>
+			<ListItemLabel>
+				<ListItemLabelPrimary>{name}</ListItemLabelPrimary>
+				<ListItemLabelSecondary>{value}</ListItemLabelSecondary>
+			</ListItemLabel>
+			{directoryButton}
+		</ListItem>
+	}
+}
+DirectoryEntry.propTypes = {
+	path: PropTypes.string.isRequired,
+	name: PropTypes.string.isRequired,
+	description: PropTypes.string.isRequired,
+	isProperty: PropTypes.bool.isRequired,
+	isEvent: PropTypes.bool.isRequired,
+	isDirectory: PropTypes.bool.isRequired,
+	value: PropTypes.any,
+	lastUpdate: PropTypes.number,
+};
+DirectoryEntry = connect(
+  state => ({
+    properties: state.qth.properties,
+    events: state.qth.events,
+  }),
+  dispatch => ({
+    watchProperty: path => dispatch(qth_actions.watchProperty(path)),
+    watchEvent: path => dispatch(qth_actions.watchEvent(path)),
+    unwatchProperty: path => dispatch(qth_actions.unwatchProperty(path)),
+    unwatchEvent: path => dispatch(qth_actions.unwatchEvent(path)),
+  }),
+)(DirectoryEntry);
+
 
 class DirectoryListing extends Component {
 	componentDidMount() {
@@ -38,74 +156,27 @@ class DirectoryListing extends Component {
 	render() {
 		const entries = [];
 		for (const [name, registrations] of Object.entries(this.props.contents)) {
+			let descriptions = [];
 			let isProperty = false;
 			let isEvent = false;
 			let isDirectory = false;
-			for (const {behaviour} of registrations) {
+			for (const {behaviour, description, client_id} of registrations) {
 				isProperty |= behaviour.startsWith("PROPERTY-");
 				isEvent |= behaviour.startsWith("EVENT-");
 				isDirectory |= behaviour == "DIRECTORY";
-			}
-			
-			let directoryButton = null;
-			if (isDirectory) {
-				directoryButton = <ListItemIcon>
-					<MdNavigateNext size={24}/>
-				</ListItemIcon>;
-			}
-			
-			// If value is ambiguously a property and an event, treat it as a
-			// property.
-			const fullPath = this.props.path + name;
-			let valueSubscription = {};
-			if (isProperty) {
-				valueSubscription = this.props.properties[fullPath] || {};
-			} else if (isEvent) {
-				valueSubscription = this.props.events[fullPath] || {};
-			}
-			
-			const value = valueSubscription.value;
-			const valueLastUpdate = valueSubscription.lastUpdate;
-			
-			let nameLabel = name;
-			if (isDirectory) {
-				if (isProperty || isEvent) {
-					nameLabel = <span>{name}<span className="trailing-slash-feint">/</span></span>;
-				} else {
-					nameLabel = <span>{name}<span className="trailing-slash">/</span></span>;
-				}
-			}
-			
-			let icon = "?";
-			let valueComponent;
-			if (isProperty) {
-				icon = "P";
-				valueComponent = <QthPropertyValue
-					value={value}
-					lastUpdate={valueLastUpdate}
-				/>;
-			} else if (isEvent) {
-				icon = "E";
-				valueComponent = <QthEventValue
-					value={value}
-					lastUpdate={valueLastUpdate}
-				/>;
-			} else if (isDirectory) {
-				icon = <MdFolder size={24} />;
-				valueComponent = null;
+				descriptions.push(`${description}\n(${behaviour} registered by ${client_id})`);
 			}
 			
 			entries.push(
-				<ListItem key={name}>
-					<ListItemIcon>{icon}</ListItemIcon>
-					<ListItemLabel>
-						<ListItemLabelPrimary>{nameLabel}</ListItemLabelPrimary>
-						<ListItemLabelSecondary>
-							{valueComponent}
-						</ListItemLabelSecondary>
-					</ListItemLabel>
-					{directoryButton}
-				</ListItem>
+				<DirectoryEntry
+					key={name}
+					name={name}
+					path={this.props.path + name}
+					isProperty={!!isProperty}
+					isEvent={!!isEvent}
+					isDirectory={!!isDirectory}
+					description={descriptions.join("\n\n")}
+				/>
 			);
 		}
 		
@@ -116,8 +187,6 @@ class DirectoryListing extends Component {
 DirectoryListing = connect(
   (state, props) => ({
     contents: ((state.qth.directories[props.path] || {}).contents) || {},
-    properties: state.qth.properties,
-    events: state.qth.events,
   }),
   dispatch => ({
     enterDirectory: path => dispatch(qth_actions.enterDirectory(path)),
