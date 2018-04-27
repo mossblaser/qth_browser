@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
+
+import ClickAnimation from "../ClickAnimation/index.jsx";
+import KeypressToClick from "../KeypressToClick/index.jsx";
 
 import "./List.less";
 
@@ -11,17 +13,28 @@ export const List = ({children}) => (
 );
 
 /** An item in a List. */
-export const ListItem = ({children, tooltip}) => (
-	<div className="ListItem" tabIndex={0} title={tooltip}>
-		{children}
-	</div>
+export const ListItem = ({children, ...props}) => (
+	<ClickAnimation {...props}>
+		<KeypressToClick>
+			<div className="ListItem" tabIndex={props.onClick ? 0 : undefined}>
+				{children}
+			</div>
+		</KeypressToClick>
+	</ClickAnimation>
 );
 
-/** An icon leading the start of the list. */
-export const ListItemIcon = ({children, onClick}) => (
-	<div className="ListItemIcon" tabIndex={onClick ? 0 : undefined}>
-		{children}
-	</div>
+/**
+ * An icon as part of a ListItem. If onClick is provided, this will be made
+ * clickable and keyboard navigable.
+ */
+export const ListItemIcon = ({children, ...props}) => (
+	<ClickAnimation {...props}>
+		<KeypressToClick>
+			<div className="ListItemIcon" tabIndex={props.onClick ? 0 : undefined}>
+				{children}
+			</div>
+		</KeypressToClick>
+	</ClickAnimation>
 );
 
 /** A label in a list. */

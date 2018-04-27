@@ -25,7 +25,11 @@ const Root = ({}) => {
 			</AppBarElement>
 		</AppBar>
 		
-		<DirectoryListing path="" />
+		<DirectoryListing
+			path=""
+			onValueClick={path => console.log("Value:", path)}
+			onDirectoryClick={path => console.log("Directory:", path)}
+		/>
 	</div>;
 }
 

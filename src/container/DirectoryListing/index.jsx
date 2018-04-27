@@ -20,7 +20,30 @@ import MdNavigateNext from "react-icons/lib/md/navigate-next";
 import MdFolder from "react-icons/lib/md/folder";
 
 
+/**
+ * A single DirectoryListing entry (not for external use).
+ *
+ * Props
+ * -----
+ * * path: The full, absolute path of the value to show.
+ * * name: Just the name of the value (no directory or trailing slashes)
+ * * description: Human readable description for tooltip.
+ * * isProperty: Is it a property?
+ * * isEvent: Is it an event?
+ * * isDirectory: Is it a directory?
+ * * onValueClick: Callback called with the full path when the value is
+ *   clicked (not emitted unless one of isProperty or isEvent are true).
+ * * onDirectoryClick: Callback called with the full path (and a trailing
+ *   slash) when the 'enter directory' button is clicked. Only emitted when
+ *   isDirectory is true.
+ */
 class DirectoryEntry extends Component {
+	constructor(props) {
+		super(props);
+		this.onDefaultClick = this.onDefaultClick.bind(this);
+		this.onDirectoryClick = this.onDirectoryClick.bind(this);
+	}
+	
 	componentDidMount() {
 		if (this.props.isProperty) {
 			this.props.watchProperty(this.props.path);
@@ -53,6 +76,25 @@ class DirectoryEntry extends Component {
 				this.props.unwatchEvent(this.props.path);
 			}
 		}
+	}
+	
+	onDefaultClick(evt) {
+		if (this.props.isProperty || this.props.isEvent) {
+			if (this.props.onValueClick) {
+				this.props.onValueClick(this.props.path);
+			}
+		} else if (this.props.isDirectory) {
+			if (this.props.onDirectoryClick) {
+				this.props.onDirectoryClick(this.props.path + "/");
+			}
+		}
+		evt.stopPropagation();
+	}
+	onDirectoryClick(evt) {
+		if (this.props.onDirectoryClick) {
+			this.props.onDirectoryClick(this.props.path + "/");
+		}
+		evt.stopPropagation();
 	}
 	
 	render() {
@@ -100,12 +142,17 @@ class DirectoryEntry extends Component {
 		// Add 'enter' directory button
 		let directoryButton = null;
 		if (isDirectory) {
-			directoryButton = <ListItemIcon>
+			// By only setting the 'onClick' property for hybrid value/directory
+			// entries we avoid having the arrow button have its own animation when
+			// it doesn't need to. 
+			directoryButton = <ListItemIcon onClick={(isProperty || isEvent)
+			                                           ?  this.onDirectoryClick
+			                                           : null}>
 				<MdNavigateNext size={24}/>
 			</ListItemIcon>;
 		}
 		
-		return <ListItem tooltip={description}>
+		return <ListItem title={description} onClick={this.onDefaultClick}> 
 			<ListItemIcon>{icon}</ListItemIcon>
 			<ListItemLabel>
 				<ListItemLabelPrimary>{name}</ListItemLabelPrimary>
@@ -122,8 +169,8 @@ DirectoryEntry.propTypes = {
 	isProperty: PropTypes.bool.isRequired,
 	isEvent: PropTypes.bool.isRequired,
 	isDirectory: PropTypes.bool.isRequired,
-	value: PropTypes.any,
-	lastUpdate: PropTypes.number,
+	onValueClick: PropTypes.func,
+	onDirectoryClick: PropTypes.func,
 };
 DirectoryEntry = connect(
   state => ({
@@ -176,6 +223,8 @@ class DirectoryListing extends Component {
 					isEvent={!!isEvent}
 					isDirectory={!!isDirectory}
 					description={descriptions.join("\n\n")}
+					onValueClick={this.props.onValueClick}
+					onDirectoryClick={this.props.onDirectoryClick}
 				/>
 			);
 		}
@@ -183,6 +232,11 @@ class DirectoryListing extends Component {
 		return <List>{entries}</List>
 	};
 }
+DirectoryEntry.propTypes = {
+	path: PropTypes.string.isRequired,
+	onValueClick: PropTypes.func,
+	onDirectoryClick: PropTypes.func,
+};
 
 DirectoryListing = connect(
   (state, props) => ({
