@@ -20,6 +20,7 @@ class ClickAnimation extends Component {
 		};
 		
 		this.triggerAnimation = this.triggerAnimation.bind(this);
+		this.preventFocusOnClick = this.preventFocusOnClick.bind(this);
 	}
 	
 	triggerAnimation(evt) {
@@ -31,11 +32,22 @@ class ClickAnimation extends Component {
 		}
 	}
 	
+	preventFocusOnClick(evt) {
+		// A bit of a hack to prevent components getting focus when clicked on
+		// (which is visually distracting). Doesn't prevent focus by keyboard
+		// navigation!
+		evt.preventDefault();
+		if (this.props.onMouseDown) {
+			return this.props.onMouseDown(evt);
+		}
+	}
+	
 	render() {
 		return <CSSTransition in={this.state.clicking}
 		                      classNames="ClickAnimation"
 		                      timeout={500}
-		                      onClick={this.props.onClick ? this.triggerAnimation : null} >
+		                      onClick={this.props.onClick ? this.triggerAnimation : null}
+		                      onMouseDown={this.preventFocusOnClick} >
 			{this.props.children}
 		</CSSTransition>;
 	}

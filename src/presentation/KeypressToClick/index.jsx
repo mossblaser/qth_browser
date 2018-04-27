@@ -13,8 +13,11 @@ class KeypressToClick extends Component {
 		// presses into the corresponding mouse events.
 		for (const [keyboardCbName, mouseCbName] of [
 			["onKeyPress", "onClick"],
-			["onKeyDown", "onMouseDown"],
-			["onKeyUp", "onMouseUp"],
+			// NB: These aren't used anywhere and cause problems with onMouseDown
+			// functions which call evt.preventDefault to prevent focus-on-click. As
+			// such I've decided to disable them for now...
+			//["onKeyDown", "onMouseDown"],
+			//["onKeyUp", "onMouseUp"],
 		]) {
 			this[keyboardCbName] = evt => {
 				if (evt.key == "Enter") {

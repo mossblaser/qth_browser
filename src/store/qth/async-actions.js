@@ -1,5 +1,7 @@
 import Client from "qth";
 
+import {allSubdirectories} from "../../qth_utils.js";
+
 import {
   enteringDirectory,
   leavingDirectory,
@@ -113,24 +115,6 @@ const getRefcount = (path, values) => {
     return 0;
   }
 };
-
-/**
- * Internal generator: Generate all of the subdirectories and containing
- * directory of a given path.
- *
- * E.g. given a Qth path, e.g. "foo/bar/baz", generates "", "foo/" and
- * "foo/bar/" or given "foo/bar/" generates the same.
- */
-function* allSubdirectories(path) {
-  yield "";
-  
-  const parts = path.split("/");
-  let curPath = "";
-  for (let i = 0; i < parts.length - 1; i++) {
-    curPath += parts[i] + "/";
-    yield curPath;
-  }
-}
 
 /**
  * Start monitoring a given directory.

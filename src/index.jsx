@@ -9,6 +9,7 @@ import reducer, {qth_actions} from "./store/index.js";
 import "./index.less";
 
 import {AppBar, AppBarElement} from "./presentation/AppBar/index.jsx";
+import BreadcrumbBar from "./presentation/BreadcrumbBar/index.jsx";
 import DirectoryListing from "./container/DirectoryListing/index.jsx";
 
 import MdMenu from "react-icons/lib/md/menu";
@@ -21,7 +22,7 @@ const Root = ({}) => {
 				<MdMenu size={24} />
 			</AppBarElement>
 			<AppBarElement>
-				meta/clients/
+				<BreadcrumbBar path="meta/clients/" isDirectory onClick={p=>console.log(p)} />
 			</AppBarElement>
 		</AppBar>
 		
