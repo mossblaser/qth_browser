@@ -34,6 +34,21 @@ const BreadcrumbSlash = ({name}) => {
 	</div>;
 };
 
+/**
+ * A breadcrumb bar which shows a Qth path broken down into clickable sections.
+ * To be placed in the AppBar.
+ *
+ * Props:
+ * * path: The path to be represented as a string.
+ * * isDirectory: If the path represents a directory (either "" or a string
+ *   ending with "/") the path will be rendered with a trailing slash. NB: If a
+ *   path such as "meta/ls/" which is both a directory and a value (it is a
+ *   property containing the root directory listing) when isDirectory is false,
+ *   a 'dot' will be shown to represent the empty path segment.
+ * * onClick: This will be called with the subpath clicked. For example, if the
+ *   path is "foo/bar/baz/" and "bar" is clicked the callback will be called
+ *   with "foo/bar/".
+ */
 const BreadcrumbBar = ({path, isDirectory, onClick}) => {
 	let key = 0;
 	const parts = [];
@@ -76,7 +91,11 @@ const BreadcrumbBar = ({path, isDirectory, onClick}) => {
 		);
 	}
 	
-	return <div className="BreadcrumbBar">{parts}</div>;
+	return <div className="BreadcrumbBar">
+		<div className="BreadcrumbBar-container">
+			{parts}
+		</div>
+	</div>;
 };
 
 export default BreadcrumbBar;

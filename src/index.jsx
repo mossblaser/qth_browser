@@ -22,7 +22,8 @@ const Root = ({}) => {
 				<MdMenu size={24} />
 			</AppBarElement>
 			<AppBarElement>
-				<BreadcrumbBar path="meta/clients/" isDirectory onClick={p=>console.log(p)} />
+				<BreadcrumbBar
+				path="meta/clients/very/deeply/nested/directory/which/wont/fit/at/all/nomatter/what/" isDirectory onClick={p=>console.log(p)} />
 			</AppBarElement>
 		</AppBar>
 		

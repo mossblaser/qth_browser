@@ -1,7 +1,20 @@
 .BreadcrumbBar {
+	/* This hackery ensures that we build from left to right but when the
+	 * breadcrumb overflows the available space the left-hand-side is truncated
+	 * first.
+	 */
+	overflow: hidden;
+	
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.BreadcrumbBar-container {
 	display: flex;
 	flex-direction: row;
 	align-items: stretch;
+	justify-content: flex-end;
 }
 
 .BreadcrumbEntry {
