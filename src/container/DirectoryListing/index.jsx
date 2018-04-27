@@ -18,6 +18,7 @@ import {QthEventValue, QthPropertyValue} from "../../presentation/QthValue/index
 
 import MdNavigateNext from "react-icons/lib/md/navigate-next";
 import MdFolder from "react-icons/lib/md/folder";
+import GoPrimitiveDot from "react-icons/lib/go/primitive-dot";
 
 
 /**
@@ -100,6 +101,11 @@ class DirectoryEntry extends Component {
 	render() {
 		const {path, isProperty, isEvent, isDirectory, description} = this.props;
 		let {name} = this.props;
+		
+		// Represent empty names with a 'dot' (e.g. "meta/ls/" is a property).
+		if (name === "") {
+			name = <GoPrimitiveDot />
+		}
 		
 		// Get the requested value
 		let entry = {};
