@@ -1,6 +1,6 @@
 import Client from "qth";
 
-import {allSubdirectories} from "../../qth_utils.js";
+import {allSubdirectories, containsEvent, containsProperty} from "../../qth_utils.js";
 
 import {
   enteringDirectory,
@@ -22,20 +22,6 @@ import {
   connected,
   disconnected,
 } from "./actions";
-
-/**
- * Internal. Does a directory contents listing contain an event?
- */
-const containsEvent = entries =>
-  entries &&
-  entries.some(({behaviour}) => behaviour.startsWith("EVENT-"));
-
-/**
- * Internal. Does a directory contents listing contain a property?
- */
-const containsProperty = entries =>
-  entries &&
-  entries.some(({behaviour}) => behaviour.startsWith("PROPERTY-"));
 
 /**
  * Connect to a new Qth server. Takes the URL of the server in the same format

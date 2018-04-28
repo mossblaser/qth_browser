@@ -15,11 +15,19 @@ import {
 } from "../../presentation/List/index.jsx";
 
 import {QthEventValue, QthPropertyValue} from "../../presentation/QthValue/index.jsx";
+import LoadingArea from "../../presentation/LoadingArea/index.jsx";
+import ErrorMessage from "../../presentation/ErrorMessage/index.jsx";
 
 import MdNavigateNext from "react-icons/lib/md/navigate-next";
 import MdFolder from "react-icons/lib/md/folder";
 import GoPrimitiveDot from "react-icons/lib/go/primitive-dot";
 
+import {
+	containsProperty,
+	containsEvent,
+	containsDirectory,
+	directoryExists,
+} from "../../qth_utils.js";
 
 /**
  * A single DirectoryListing entry (not for external use).
@@ -209,14 +217,12 @@ class DirectoryListing extends Component {
 	render() {
 		const entries = [];
 		for (const [name, registrations] of Object.entries(this.props.contents)) {
+			let isProperty = containsProperty(registrations);
+			let isEvent =  containsEvent(registrations);
+			let isDirectory = containsDirectory(registrations);
+			
 			let descriptions = [];
-			let isProperty = false;
-			let isEvent = false;
-			let isDirectory = false;
 			for (const {behaviour, description, client_id} of registrations) {
-				isProperty |= behaviour.startsWith("PROPERTY-");
-				isEvent |= behaviour.startsWith("EVENT-");
-				isDirectory |= behaviour == "DIRECTORY";
 				descriptions.push(`${description}\n(${behaviour} registered by ${client_id})`);
 			}
 			
@@ -234,8 +240,15 @@ class DirectoryListing extends Component {
 				/>
 			);
 		}
+		const directoryListing = <List>{entries}</List>;
 		
-		return <List>{entries}</List>
+		const noDirectoryError = <ErrorMessage>
+			{`Directory does not exist!`}
+		</ErrorMessage>;
+		
+		return <LoadingArea loaded={this.props.directoryExists !== undefined}>
+			{this.props.directoryExists !== false ? directoryListing : noDirectoryError}
+		</LoadingArea>
 	};
 }
 DirectoryEntry.propTypes = {
@@ -247,6 +260,7 @@ DirectoryEntry.propTypes = {
 DirectoryListing = connect(
   (state, props) => ({
     contents: ((state.qth.directories[props.path] || {}).contents) || {},
+    directoryExists: directoryExists(props.path, state.qth.directories),
   }),
   dispatch => ({
     enterDirectory: path => dispatch(qth_actions.enterDirectory(path)),

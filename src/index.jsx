@@ -27,7 +27,7 @@ const Root = ({}) => {
 		</AppBar>
 		
 		<DirectoryListing
-			path=""
+			path="meta/clients/"
 			onValueClick={path => console.log("Value:", path)}
 			onDirectoryClick={path => console.log("Directory:", path)}
 		/>

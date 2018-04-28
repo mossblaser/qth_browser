@@ -1,0 +1,31 @@
+.LoadingArea {
+	position: relative;
+}
+.LoadingArea-content {
+	&.loading-appear,
+	&.loading-appear-active {
+		/* During initial appearance, don't fade immediately to allow time for
+		 * values to appear.
+		 */
+		opacity: 1.0;
+	}
+	
+	&.loading-enter,
+	&.loading-enter-active {
+		opacity: 0.5;
+		transition: opacity 0.5s;
+	}
+	
+	&.loading-appear-done,
+	&.loading-enter-done {
+		opacity: 0.5;
+		transition: opacity 0.2s;
+	}
+	
+	&.loading-exit,
+	&.loading-exit-active,
+	&.loading-exit-done {
+		opacity: 1.0;
+		transition: opacity 0.2s;
+	}
+}

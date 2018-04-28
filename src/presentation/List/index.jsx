@@ -13,10 +13,10 @@ export const List = ({children}) => (
 );
 
 /** An item in a List. */
-export const ListItem = ({children, ...props}) => (
-	<ClickAnimation {...props}>
+export const ListItem = ({children, onClick, ...props}) => (
+	<ClickAnimation onClick={onClick}>
 		<KeypressToClick>
-			<div className="ListItem" tabIndex={props.onClick ? 0 : undefined}>
+			<div className="ListItem" tabIndex={onClick ? 0 : undefined} {...props}>
 				{children}
 			</div>
 		</KeypressToClick>
