@@ -210,7 +210,7 @@ const pendingActionComplete = (path, oldPendingActions) => {
   return pendingActions;
 };
 
-const initial_state = {
+const initialState = {
   host: null,
   client: null,
   connected: false,
@@ -224,7 +224,7 @@ const initial_state = {
 /**
  * Reducer for Qth store state.
  */
-const qth = (state=initial_state, action={}) => {
+const qth = (state=initialState, action={}) => {
   switch (action.type) {
     case "CONNECTING":
       return {
@@ -244,7 +244,7 @@ const qth = (state=initial_state, action={}) => {
         // probably just confuse users as if anything stays in this list long
         // enough for the user to try a new connection they've probably long
         // forgotten about them).
-        pendingActions: initial_state.pendingActions,
+        pendingActions: initialState.pendingActions,
       };
     
     case "CONNECTED":
@@ -263,7 +263,7 @@ const qth = (state=initial_state, action={}) => {
         directories: invalidateAllDirectories(state.directories),
         events: invalidateAllValues(state.events),
         properties: invalidateAllValues(state.properties),
-        pendingActions: initial_state.pendingActions,
+        pendingActions: initialState.pendingActions,
       };
     
     case "ENTERING_DIRECTORY":

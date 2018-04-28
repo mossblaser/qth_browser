@@ -21,14 +21,25 @@ class ClickAnimation extends Component {
 		
 		this.triggerAnimation = this.triggerAnimation.bind(this);
 		this.preventFocusOnClick = this.preventFocusOnClick.bind(this);
+		
+		this.timeouts = [];
 	}
 	
 	triggerAnimation(evt) {
 		this.setState({clicking: false});
-		setTimeout(() => this.setState({clicking: true}), 1);
+		this.timeouts.push(setTimeout(() => {
+			this.setState({clicking: true});
+			this.timeouts.shift();
+		}, 1));
 		
 		if (this.props.onClick) {
 			this.props.onClick(evt);
+		}
+	}
+	
+	componentWillUnmount() {
+		for (const id of this.timeouts) {
+			clearTimeout(id);
 		}
 	}
 	
