@@ -86,37 +86,54 @@ class QthPropertyValue extends Component {
 		super(props);
 		this.state = {
 			creationTime: (new Date()).getTime(),
+			
+			// While true allow cached values to be shown before treating the
+			// proprety as deleted
+			showCachedValues: true,
 		};
+		
+		this.showCachedValuesTimeout = setTimeout(() => {
+			this.setState({showCachedValues: false});
+			this.showCachedValuesTimeout = null;
+		}, 500);
+	}
+	
+	componentWillUnmount() {
+		if (this.showCachedValuesTimeout !== null) {
+			clearTimeout(this.showCachedValuesTimeout);
+		}
 	}
 	
 	render() {
 		const {value, lastUpdate} = this.props;
 		
 		// Only show the value if it is both present and we have actually received
-		// a value. (i.e. don't show cached values).
+		// a value. An exception: show cahced values briefly on creation to hide
+		// loading time.
+		const haveValidValue = (!!lastUpdate) || this.state.showCachedValues;
 		
 		// TODO: In the future we might want to show the cached values while
 		// loading...
-		const text = (value === undefined || !lastUpdate)
+		const text = (value === undefined || !haveValidValue)
 			? "(deleted)"
 			: JSON.stringify(value);
 		
 		// If a no value has appeared yet don't immediatley show it as '(deleted)',
 		// use CSS to add a delay before this appears so that it doesn't
 		// flash up before the value arrived.
-		const delayAnimation = !lastUpdate;
+		const delayAnimation = !haveValidValue;
 		
 		// If a value arrives in the first 'changeAnimationDuration' ms after this
 		// component is created, show the value immediately without any
 		// animation. This value probably only arrived late because the
 		// subscription was still being set up.
 		const noAnimation = (
-			lastUpdate &&
-			((lastUpdate - this.state.creationTime) < changeAnimationDuration)
+			(lastUpdate &&
+			 ((lastUpdate - this.state.creationTime) < changeAnimationDuration))
 		);
 		
 		// Is the value is being explicitly deleted?
-		const deleteAnimation = (value === undefined) && !!lastUpdate;
+		const deleteAnimation = (value === undefined) && haveValidValue;
 		
 		// Because we need to modify the animation of a div which TransitionGroup
 		// has previously copied during deletion (to animate crossing it out) and
