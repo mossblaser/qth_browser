@@ -215,8 +215,13 @@ class DirectoryListing extends Component {
 	}
 	
 	render() {
-		const entries = [];
-		for (const [name, registrations] of Object.entries(this.props.contents)) {
+		const directoryEntries = [];
+		const otherEntries = [];
+		
+		const sortedContents = Object.entries(this.props.contents);
+		sortedContents.sort(([a], [b]) => a > b);
+		
+		for (const [name, registrations] of sortedContents) {
 			let isProperty = containsProperty(registrations);
 			let isEvent =  containsEvent(registrations);
 			let isDirectory = containsDirectory(registrations);
@@ -226,6 +231,11 @@ class DirectoryListing extends Component {
 				descriptions.push(`${description}\n(${behaviour} registered by ${client_id})`);
 			}
 			
+			// (Pure) directories are listed before other values, accumulate these in
+			// different lists.
+			const entries = ((isDirectory && !(isProperty || isEvent))
+			                  ? directoryEntries
+			                  : otherEntries);
 			entries.push(
 				<DirectoryEntry
 					key={name}
@@ -240,7 +250,10 @@ class DirectoryListing extends Component {
 				/>
 			);
 		}
-		const directoryListing = <List>{entries}</List>;
+		const directoryListing = <List>
+			{directoryEntries}
+			{otherEntries}
+		</List>;
 		
 		const noDirectoryError = <ErrorMessage>
 			{`Directory does not exist!`}

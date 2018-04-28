@@ -22,12 +22,12 @@ const Root = ({}) => {
 				<MdMenu size={24} />
 			</AppBarElement>
 			<AppBarElement>
-				<BreadcrumbBar path="meta/clients/" isDirectory onClick={p=>console.log(p)} />
+				<BreadcrumbBar path="" isDirectory onClick={p=>console.log(p)} />
 			</AppBarElement>
 		</AppBar>
 		
 		<DirectoryListing
-			path="meta/clients/"
+			path=""
 			onValueClick={path => console.log("Value:", path)}
 			onDirectoryClick={path => console.log("Directory:", path)}
 		/>
