@@ -169,7 +169,9 @@ class DirectoryEntry extends Component {
 		return <ListItem title={description} onClick={this.onDefaultClick}> 
 			<ListItemIcon>{icon}</ListItemIcon>
 			<ListItemLabel>
-				<ListItemLabelPrimary>{name}</ListItemLabelPrimary>
+				<ListItemLabelPrimary>
+					<span style={{whiteSpace: "pre"}}>{name}</span>
+				</ListItemLabelPrimary>
 				<ListItemLabelSecondary>{value}</ListItemLabelSecondary>
 			</ListItemLabel>
 			{directoryButton}
