@@ -10,12 +10,14 @@ import "./index.less";
 
 import {AppBar, AppBarElement} from "./presentation/AppBar/index.jsx";
 import BreadcrumbBar from "./presentation/BreadcrumbBar/index.jsx";
+import EnterLeaveAnimation from "./presentation/EnterLeaveAnimation/index.jsx";
+
 import DirectoryListing from "./container/DirectoryListing/index.jsx";
 
 import MdMenu from "react-icons/lib/md/menu";
 
 
-let Root = ({path, showDirectory}) => {
+let Root = ({path, showDirectory, hierarchyDirection}) => {
 	return <div className="Root">
 		<AppBar>
 			<AppBarElement>
@@ -26,16 +28,21 @@ let Root = ({path, showDirectory}) => {
 			</AppBarElement>
 		</AppBar>
 		
-		<DirectoryListing
-			path={path}
-			onValueClick={path => console.log("Value:", path)}
-			onDirectoryClick={showDirectory}
-		/>
+		<EnterLeaveAnimation go={hierarchyDirection === "ASCEND"
+		                         ?  "right" : "left" }>
+			<DirectoryListing
+				key={path}
+				path={path}
+				onValueClick={path => console.log("Value:", path)}
+				onDirectoryClick={showDirectory}
+			/>
+		</EnterLeaveAnimation>
 	</div>;
 };
 Root = connect(
 	state => ({
 		path: state.ui.path,
+		hierarchyDirection: state.ui.hierarchyDirection,
 	}),
 	dispatch => ({
 		showDirectory: path => dispatch(ui_actions.showDirectory(path)),

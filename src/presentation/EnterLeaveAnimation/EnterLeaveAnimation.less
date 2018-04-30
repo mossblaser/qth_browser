@@ -1,0 +1,53 @@
+@import "../css/definitions.less";
+
+.EnterLeaveAnimation {
+	flex-grow: 1;
+	
+	overflow: hidden;
+	position: relative;
+	
+	.EnterLeaveAnimation-child {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		
+		overflow-y: auto;
+		
+		&.animation-enter,
+		&.animation-exit {
+			transition: transform @page-transition-delay ease-out;
+		}
+	}
+	
+	&.go-left .EnterLeaveAnimation-child {
+		&.animation-enter {
+			transform: translate(100%, 0);
+		}
+		&.animation-enter-active {
+			transform: translate(0%, 0);
+		}
+		&.animation-exit {
+			transform: translate(0%, 0);
+		}
+		&.animation-exit-active {
+			transform: translate(-100%, 0);
+		}
+	}
+	&.go-right .EnterLeaveAnimation-child {
+		&.animation-enter {
+			transform: translate(-100%, 0);
+		}
+		&.animation-enter-active {
+			transform: translate(0%, 0);
+		}
+		&.animation-exit {
+			transform: translate(0%, 0);
+		}
+		&.animation-exit-active {
+			transform: translate(100%, 0);
+		}
+	}
+}
+
