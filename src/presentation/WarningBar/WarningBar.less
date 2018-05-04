@@ -1,0 +1,21 @@
+@import "../css/definitions.less";
+
+.WarningBar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	
+	padding: 4px;
+	
+	background-color: fadeout(@secondary-colour, 90%);
+	
+	border-bottom-color: @secondary-colour;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+.WarningBar-icon {
+	color: @secondary-colour;
+	
+	margin-right: 8px;
+}

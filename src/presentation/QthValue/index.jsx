@@ -25,6 +25,9 @@ const changeAnimationDuration = 200;
  *   value available).
  * * lastUpdate: The time (in ms since the epoch) when the event last occurred
  *   or undefined if not known.
+ * * multiline: Show value over multiple lines (or strictly one truncated line
+ *   if not true).
+ * * nofade: If true, don't fade out the event value completely.
  */
 class QthEventValue extends Component {
 	constructor(props) {
@@ -37,22 +40,41 @@ class QthEventValue extends Component {
 	render() {
 		const {value, lastUpdate} = this.props;
 		
-		let text = JSON.stringify(value);
+		// Select multiple or single line format
+		let className = "QthEventValue";
+		let text;
+		if (this.props.multiline) {
+			className += " QthValue-multiline";
+			text = JSON.stringify(value, null, 2);
+		} else {
+			className += " QthValue-oneline";
+			text = JSON.stringify(value);
+		}
+		
+		// Disable fading if required
+		className += this.props.nofade
+			? " QthEventValue-nofade"
+			: " QthEventValue-fade";
+		
 		if (value === undefined) {
 			text = " ";
 		}
-		if (lastUpdate === undefined || lastUpdate < this.state.creationTime) {
-			// Stale value, don't show it
+		if (lastUpdate === undefined) {
+			// No value, show nothing
+			text = " ";
+		}
+		if (lastUpdate < this.state.creationTime && !this.props.nofade) {
+			// Stale value, hide it if fading is enabled
 			text = " ";
 		}
 		
 		// The 'lastUpdate' key ensures that this div is replaced whenever the
 		// event occurs thus ensuring the fade-out animation is replayed.
-		return <TransitionGroup timeout={changeAnimationDuration}>
+		return <TransitionGroup timeout={changeAnimationDuration} appear>
 			<CSSTransition classNames="QthValue-change-animation"
 			               timeout={changeAnimationDuration}
 			               key={this.props.lastUpdate||0}>
-				<div className="QthEventValue">
+				<div className={className}>
 					{text}
 				</div>
 			</CSSTransition>
@@ -62,6 +84,8 @@ class QthEventValue extends Component {
 QthEventValue.propTypes = {
 	value: PropTypes.any,
 	lastUpdate: PropTypes.number,
+	multiline: PropTypes.bool,
+	nofade: PropTypes.bool,
 };
 
 /**
@@ -80,6 +104,8 @@ QthEventValue.propTypes = {
  *   value available).
  * * lastUpdate: The time (in ms since the epoch) when the property last
  *   changed or undefined if no value reports have been received.
+ * * multiline: Show value over multiple lines (or strictly one truncated line
+ *   if not true).
  */
 class QthPropertyValue extends Component {
 	constructor(props) {
@@ -112,11 +138,20 @@ class QthPropertyValue extends Component {
 		// loading time.
 		const haveValidValue = (!!lastUpdate) || this.state.showCachedValues;
 		
-		// TODO: In the future we might want to show the cached values while
-		// loading...
+		// Select multiple or single line format
+		let className = "QthPropertyValue";
+		let formattedValue;
+		if (this.props.multiline) {
+			className += " QthValue-multiline";
+			formattedValue = JSON.stringify(value, null, 2)
+		} else {
+			className += " QthValue-oneline";
+			formattedValue = JSON.stringify(value)
+		}
+		
 		const text = (value === undefined || !haveValidValue)
 			? "(deleted)"
-			: JSON.stringify(value);
+			: formattedValue;
 		
 		// If a no value has appeared yet don't immediatley show it as '(deleted)',
 		// use CSS to add a delay before this appears so that it doesn't
@@ -157,7 +192,7 @@ class QthPropertyValue extends Component {
 			<CSSTransition classNames="QthValue-change-animation"
 			               timeout={changeAnimationDuration}
 			               key={this.props.lastUpdate||0}>
-				<div className="QthPropertyValue">
+				<div className={className}>
 					{text}
 				</div>
 			</CSSTransition>
@@ -167,6 +202,7 @@ class QthPropertyValue extends Component {
 QthPropertyValue.propTypes = {
 	value: PropTypes.any,
 	lastUpdate: PropTypes.number,
+	multiline: PropTypes.bool,
 };
 
 

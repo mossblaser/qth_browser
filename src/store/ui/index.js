@@ -14,6 +14,11 @@
  *   hierarchyDirection: "DIRECTORY",
  *   // What type of display is open. One of 'DIRECTORY' or 'VALUE'.
  *   mode: "DIRECTORY",
+ *   // A least-recently-used cache of property and event values set/sent by
+ *   // the client. Most recently used first. Populated by snooping on Qth
+ *   // actions.
+ *   recentPropertyValues: [value, ...],
+ *   recentEventValues: [value, ...],
  * }
  */
 

@@ -1,10 +1,10 @@
 import {combineReducers} from "redux";
 
 import qth from "./qth";
-import * as qth_actions from "./qth";
+import * as qthActions from "./qth";
 
 import ui from "./ui";
-import * as ui_actions from "./ui";
+import * as uiActions from "./ui";
 
 const reducer = combineReducers({
   qth,
@@ -12,4 +12,4 @@ const reducer = combineReducers({
 });
 
 export default reducer;
-export {qth_actions, ui_actions};
+export {qthActions, uiActions};

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import {connect} from "react-redux";
 
-import {qth_actions} from "../../store/index.js";
+import {qthActions} from "../../store/index.js";
 
 import {
 	List,
@@ -17,9 +17,9 @@ import {
 import {QthEventValue, QthPropertyValue} from "../../presentation/QthValue/index.jsx";
 import LoadingArea from "../../presentation/LoadingArea/index.jsx";
 import ErrorMessage from "../../presentation/ErrorMessage/index.jsx";
+import QthValueIcon from "../../presentation/QthValueIcon/index.jsx";
 
 import MdNavigateNext from "react-icons/lib/md/navigate-next";
-import MdFolder from "react-icons/lib/md/folder";
 import GoPrimitiveDot from "react-icons/lib/go/primitive-dot";
 
 import {
@@ -124,15 +124,17 @@ class DirectoryEntry extends Component {
 		}
 		let {value, lastUpdate} = entry || {};
 		
-		// Choose an icon
-		let icon = "?";
+		// Choose an icon.
+		// TODO: Use actual behaviour rather than making it up.
+		let behaviour;
 		if (isProperty) {
-			icon = "P";
+			behaviour = "PROPERTY-1:N";
 		} else if (isEvent) {
-			icon = "E";
+			behaviour = "EVENT-1:N";
 		} else if (isDirectory) {
-			icon = <MdFolder size={24} />;
+			behaviour = "DIRECTORY";
 		}
+		const icon = <QthValueIcon behaviour={behaviour} size={24} />;
 		
 		// Add a trailing slash to the name if this is a directory
 		if (isDirectory) {
@@ -194,10 +196,10 @@ DirectoryEntry = connect(
     events: state.qth.events,
   }),
   dispatch => ({
-    watchProperty: path => dispatch(qth_actions.watchProperty(path)),
-    watchEvent: path => dispatch(qth_actions.watchEvent(path)),
-    unwatchProperty: path => dispatch(qth_actions.unwatchProperty(path)),
-    unwatchEvent: path => dispatch(qth_actions.unwatchEvent(path)),
+    watchProperty: path => dispatch(qthActions.watchProperty(path)),
+    watchEvent: path => dispatch(qthActions.watchEvent(path)),
+    unwatchProperty: path => dispatch(qthActions.unwatchProperty(path)),
+    unwatchEvent: path => dispatch(qthActions.unwatchEvent(path)),
   }),
 )(DirectoryEntry);
 
@@ -278,8 +280,8 @@ DirectoryListing = connect(
     directoryExists: directoryExists(props.path, state.qth.directories),
   }),
   dispatch => ({
-    enterDirectory: path => dispatch(qth_actions.enterDirectory(path)),
-    leaveDirectory: path => dispatch(qth_actions.leaveDirectory(path)),
+    enterDirectory: path => dispatch(qthActions.enterDirectory(path)),
+    leaveDirectory: path => dispatch(qthActions.leaveDirectory(path)),
   }),
 )(DirectoryListing);
 

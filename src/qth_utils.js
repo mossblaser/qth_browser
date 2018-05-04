@@ -20,6 +20,25 @@ export const containsDirectory = entries =>
   entries.some(({behaviour}) => behaviour == "DIRECTORY");
 
 /**
+ * Given a Qth value path, returns the directory name. (NB: Given a directory
+ * path, returns the same path!).
+ */
+export const dirname = path => {
+	const parts = path.split("/");
+	parts[parts.length - 1] = "";
+	return parts.join("/");
+}
+
+/**
+ * Given a Qth value path, returns the name of the value within its current
+ * directory. (E.g. for "foo/bar" returns "bar").
+ */
+export const basename = path => {
+	const parts = path.split("/");
+	return parts[parts.length - 1];
+}
+
+/**
  * Generate all of the subdirectories and containing directory of a given path.
  *
  * E.g. given a Qth path, e.g. "foo/bar/baz", generates "", "foo/" and

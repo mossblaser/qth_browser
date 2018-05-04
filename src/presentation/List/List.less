@@ -6,6 +6,12 @@
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: stretch;
+  
+  &:not(:first-child) .ListItem:first-child {
+    border-top-color: #eee;
+    border-top-width: 1px;
+    border-top-style: solid;
+  }
 }
 
 .ListItem {
@@ -74,8 +80,8 @@
   flex-grow: 1;
   flex-shrink: 1;
   
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 	
 	min-width: 100px;
 }
@@ -86,5 +92,7 @@
 .ListItemLabelSecondary {
   opacity: 0.5;
   font-size: 12px;
+  
+  margin-top: 4px;
 }
 

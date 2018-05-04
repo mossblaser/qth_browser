@@ -38,22 +38,22 @@ export const ListItemIcon = ({children, ...props}) => (
 );
 
 /** A label in a list. */
-export const ListItemLabel = ({children}) => (
-	<div className="ListItemLabel">
+export const ListItemLabel = ({children, ...props}) => (
+	<div className="ListItemLabel" {...props}>
 		{children}
 	</div>
 );
 
 /** Primary part of a ListItemLabel. */
-export const ListItemLabelPrimary = ({children}) => (
-	<div className="ListItemLabelPrimary">
+export const ListItemLabelPrimary = ({children, ...props}) => (
+	<div className="ListItemLabelPrimary" {...props}>
 		{children}
 	</div>
 );
 
 /** Secondary part of a ListItemLabel. */
-export const ListItemLabelSecondary = ({children}) => (
-	<div className="ListItemLabelSecondary">
+export const ListItemLabelSecondary = ({children, ...props}) => (
+	<div className="ListItemLabelSecondary" {...props}>
 		{children}
 	</div>
 );

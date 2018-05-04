@@ -9,7 +9,7 @@ export const showDirectory = path => ({
 /**
  * Setup the main UI to show a Qth value at a particular path.
  */
-export const showPath = path => ({
+export const showValue = path => ({
 	type: "SHOW_VALUE",
 	path,
 });

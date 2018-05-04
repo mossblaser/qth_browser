@@ -1,0 +1,42 @@
+.InlineToolbar {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	
+	/* Clips off click animations */
+	overflow: hidden;
+	
+	padding-left: 8px;
+	padding-right: 8px;
+	
+	border-bottom-color: #ccc;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	
+	border-top-color: #ccc;
+	border-top-width: 1px;
+	border-top-style: solid;
+}
+
+.InlineToolbarButton {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	
+	cursor: pointer;
+	
+	user-select: none;
+	
+	box-sizing: border-box;
+	min-width: 48px;
+	min-height: 48px;
+	
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+.InlineToolbarSpacer {
+	flex-grow: 1;
+}

@@ -5,9 +5,14 @@
 	font-family: monospace;
 	white-space: pre;
 	
-	/* Truncate to fit one line */
-	overflow: hidden;
-	text-overflow: ellipsis;
+	&.QthValue-oneline {
+		/* Truncate to fit one line */
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	&.QthValue-multiline {
+		/* Allow the container to deal with overspill. */
+	}
 }
 
 .QthValue-change-animation {
@@ -51,8 +56,14 @@
 	.QthValue-change-animation;
 	
 	/* Gradually fade out events */
+	&.QthValue-change-animation-appear,
 	&.QthValue-change-animation-enter-done {
-		opacity: 0.0;
+		&.QthEventValue-nofade{
+			opacity: 0.30;
+		}
+		&.QthEventValue-fade{
+			opacity: 0.0;
+		}
 		transition: opacity @qth-event-fade-duration ease-out;
 	}
 }
