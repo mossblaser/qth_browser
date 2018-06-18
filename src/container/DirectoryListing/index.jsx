@@ -223,7 +223,7 @@ class DirectoryListing extends Component {
 		const otherEntries = [];
 		
 		const sortedContents = Object.entries(this.props.contents);
-		sortedContents.sort(([a], [b]) => a > b);
+		sortedContents.sort(([a], [b]) => a.localeCompare(b));
 		
 		for (const [name, registrations] of sortedContents) {
 			let isProperty = containsProperty(registrations);
