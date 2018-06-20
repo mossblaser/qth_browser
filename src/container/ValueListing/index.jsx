@@ -15,6 +15,7 @@ import QthValueEditor from "../../presentation/QthValueEditor/index.jsx";
 
 import RegistrationList from "../../presentation/RegistrationList/index.jsx";
 import SectionHeading from "../../presentation/SectionHeading/index.jsx";
+import Description from "../../presentation/Description/index.jsx";
 
 class ValueListing extends Component {
 	constructor(props) {
@@ -134,14 +135,18 @@ class ValueListing extends Component {
 		const suggestions = Array.from(suggestionSet);
 		suggestions.sort();
 		
+		const directoryEntry = this.props.directoryEntry || [];
+		const description = (directoryEntry[0] || {}).description || "";
+		
 		const registrationList = this.props.directoryEntry
 			? <RegistrationList
 					path={this.props.path}
-					registrations={this.props.directoryEntry || []}
+					registrations={directoryEntry}
 					onValueClick={this.props.onValueClick}
 					onDirectoryClick={this.props.onDirectoryClick}
 				/>
 			: <ErrorMessage>No registrations.</ErrorMessage>;
+		
 		
 		return <div>
 			{loading ? <LoadingBar /> : null}
@@ -155,6 +160,8 @@ class ValueListing extends Component {
 				onChange={treatAs === "PROPERTY" ? this.setProperty : this.sendEvent}
 				onDelete={this.deleteProperty}
 			/>
+			<SectionHeading>Description</SectionHeading>
+			<Description>{description}</Description>
 			<SectionHeading>Registration</SectionHeading>
 			{registrationList}
 		</div>;

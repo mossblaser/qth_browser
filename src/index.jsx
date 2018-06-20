@@ -116,7 +116,7 @@ Root = connect(
 )(Root);
 
 const store = createStore(reducer, applyMiddleware(ReduxThunk));
-store.dispatch(qthActions.connect("ws://localhost:8080/"));
+store.dispatch(qthActions.connect("ws://server:8080/"));
 store.dispatch(uiActions.showDirectory(""));
 
 ReactDOM.render(
