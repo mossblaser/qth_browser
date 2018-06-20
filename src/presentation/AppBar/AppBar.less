@@ -33,3 +33,22 @@
   overflow: hidden;
 }
 
+
+.AppBarButton {
+	flex-shrink: 0;
+	
+	outline: none;
+	
+	padding-left: 8px;
+	padding-right: 8px;
+	
+	/* Ensure a clickable width (accounting for padding) */
+	min-width: 48px - 8px - 8px;
+	line-height: 48px;
+	
+	text-align: center;
+	
+	&:focus {
+		background-color: rgba(255, 255, 255, 0.3);
+	}
+}

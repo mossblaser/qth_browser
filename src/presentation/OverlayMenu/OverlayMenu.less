@@ -1,0 +1,100 @@
+@import "../css/definitions.less";
+
+@menu-width: 300px;
+@menu-shadow-width: 16px;
+
+.OverlayMenu {
+	position: fixed;
+	
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	
+	background-color: fadeout(black, 80%);
+	
+	z-index: 9999;
+	
+	&.animation-enter {
+		background-color: fadeout(black, 100%);
+	}
+	&.animation-enter-active {
+		background-color: fadeout(black, 80%);
+		transition: background-color @menu-transition-delay;
+	}
+	&.animation-exit-active {
+		background-color: fadeout(black, 100%);
+		transition: background-color @menu-transition-delay;
+	}
+	
+	.OverlayMenu-inner {
+		position: absolute;
+		
+		top: 0;
+		left: 0;
+		bottom: 0;
+		width: @menu-width;
+		
+		overflow-y: auto;
+		
+		background-color: white;
+		box-shadow: 0 0 @menu-shadow-width fadeout(black, 70%);
+		
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: flex-start;
+	}
+	
+	&.animation-enter .OverlayMenu-inner {
+		left: -@menu-width - @menu-shadow-width;
+	}
+	&.animation-enter-active .OverlayMenu-inner {
+		transition: left @menu-transition-delay ease-out;
+		left: 0;
+	}
+	
+	&.animation-exit-active .OverlayMenu-inner {
+		transition: left @menu-transition-delay ease-in;
+		left: -@menu-width - @menu-shadow-width;
+	}
+}
+
+.OverlayMenuEntry, .OverlayMenuHeader {
+	box-sizing: border-box;
+	
+	min-height: @touch-size;
+	
+	padding-left: 16px;
+	padding-right: 16px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	
+	flex-grow: 0;
+	flex-shrink: 0;
+	
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	
+	overflow: hidden;
+	
+	border-bottom-style: solid;
+	border-bottom-color: fadeout(black, 70%);
+	border-bottom-width: 1px;
+	
+	outline: none;
+	
+	&:focus {
+		background-color: fadeout(black, 90%);
+	}
+}
+
+.OverlayMenuHeader {
+	background-color: @primary-colour;
+  border-bottom-style: none;
+  
+  font-size: 20px;
+  font-weight: medium;
+}

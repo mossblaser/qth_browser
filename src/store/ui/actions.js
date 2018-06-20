@@ -1,4 +1,18 @@
 /**
+ * Show the main menu
+ */
+export const showMenu = () => ({
+	type: "SHOW_MENU",
+});
+
+/**
+ * Hide the main menu
+ */
+export const hideMenu = () => ({
+	type: "HIDE_MENU",
+});
+
+/**
  * Setup the main UI to show a directory listing for the given path.
  */
 export const showDirectory = path => ({

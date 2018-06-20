@@ -33,10 +33,23 @@ const initialState = {
 	mode: "DIRECTORY",
 	recentPropertyValues: [],
 	recentEventValues: [],
+	menuVisible: false,
 };
 
 const ui = (state=initialState, action={}) => {
 	switch (action.type) {
+		case "SHOW_MENU":
+			return {
+				...state,
+				menuVisible: true,
+			};
+		
+		case "HIDE_MENU":
+			return {
+				...state,
+				menuVisible: false,
+			};
+		
 		case "SHOW_DIRECTORY":
 			let hierarchyDirection;
 			if (state.mode == "DIRECTORY") {

@@ -19,6 +19,8 @@
  *   // actions.
  *   recentPropertyValues: [value, ...],
  *   recentEventValues: [value, ...],
+ *   // Is the menu visible?
+ *   menuVisible: false,
  * }
  */
 

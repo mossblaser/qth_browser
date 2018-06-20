@@ -8,7 +8,8 @@ import reducer, {qthActions, uiActions} from "./store/index.js";
 
 import "./index.less";
 
-import {AppBar, AppBarElement} from "./presentation/AppBar/index.jsx";
+import {AppBar, AppBarElement, AppBarButton} from "./presentation/AppBar/index.jsx";
+import {OverlayMenu, OverlayMenuHeader, OverlayMenuEntry} from "./presentation/OverlayMenu/index.jsx";
 import BreadcrumbBar from "./presentation/BreadcrumbBar/index.jsx";
 import EnterLeaveAnimation from "./presentation/EnterLeaveAnimation/index.jsx";
 
@@ -18,7 +19,9 @@ import ValueListing from "./container/ValueListing/index.jsx";
 import MdMenu from "react-icons/lib/md/menu";
 
 
-let Root = ({path, uiMode, showDirectory, showValue, hierarchyDirection}) => {
+let Root = ({path, uiMode, menuVisible, qthHost,
+             showMenu, hideMenu, showDirectory, showValue, hierarchyDirection,
+             connect}) => {
 	let body;
 	if (uiMode == "DIRECTORY") {
 		body = <DirectoryListing
@@ -36,11 +39,50 @@ let Root = ({path, uiMode, showDirectory, showValue, hierarchyDirection}) => {
 		/>;
 	}
 	
+	const connectToServerClicked = () => {
+		const host = prompt("Enter server Websocket URL", qthHost || "ws://");
+		if (host !== null) {
+			connect(host);
+		}
+	};
+	const goToDirectoryClicked = () => {
+		let selectedPath = path || "";
+		while (true) {
+			selectedPath = prompt("Enter directory path", selectedPath);
+			if (selectedPath === null) {
+				return;
+			}
+			if (!(selectedPath === "" || selectedPath.endsWith("/"))) {
+				alert("Directory paths must be empty or end with a '/'");
+				continue;
+			}
+			
+			showDirectory(selectedPath);
+			return;
+		}
+	};
+	const goToValueClicked = () => {
+		const selectedPath = prompt("Enter directory path", path || "");;
+		if (selectedPath !== null) {
+			showValue(selectedPath);
+		}
+	};
+	
 	return <div className="Root">
+		<OverlayMenu
+			visible={menuVisible}
+			onDismiss={hideMenu}
+		>
+			<OverlayMenuHeader onClick={hideMenu}>Qth</OverlayMenuHeader>
+			<OverlayMenuEntry onClick={connectToServerClicked}>Connect to server</OverlayMenuEntry>
+			<OverlayMenuEntry onClick={goToDirectoryClicked}>Go to directory</OverlayMenuEntry>
+			<OverlayMenuEntry onClick={goToValueClicked}>Go to value</OverlayMenuEntry>
+		</OverlayMenu>
+		
 		<AppBar>
-			<AppBarElement>
+			<AppBarButton onClick={showMenu}>
 				<MdMenu size={24} />
-			</AppBarElement>
+			</AppBarButton>
 			<AppBarElement>
 				<BreadcrumbBar path={path}
 				               isDirectory={uiMode === "DIRECTORY"}
@@ -61,16 +103,21 @@ Root = connect(
 		path: state.ui.path,
 		uiMode: state.ui.mode,
 		hierarchyDirection: state.ui.hierarchyDirection,
+		menuVisible: state.ui.menuVisible,
+		qthHost: state.qth.host,
 	}),
 	dispatch => ({
+		showMenu: () => dispatch(uiActions.showMenu()),
+		hideMenu: () => dispatch(uiActions.hideMenu()),
 		showDirectory: path => dispatch(uiActions.showDirectory(path)),
 		showValue: path => dispatch(uiActions.showValue(path)),
+		connect: (host) => dispatch(qthActions.connect(host)),
 	}),
 )(Root);
 
 const store = createStore(reducer, applyMiddleware(ReduxThunk));
 store.dispatch(qthActions.connect("ws://localhost:8080/"));
-store.dispatch(uiActions.showValue("qbs_light"));
+store.dispatch(uiActions.showDirectory(""));
 
 ReactDOM.render(
 	<Provider store={store}>
