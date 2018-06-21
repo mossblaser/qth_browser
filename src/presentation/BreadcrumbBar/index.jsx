@@ -62,16 +62,20 @@ const BreadcrumbBar = ({path, isDirectory, onClick}) => {
 	const subpaths = path.split("/");
 	const [lastSubpath] = subpaths.splice(subpaths.length-1, 1);
 	
+	let subpathsRemaining = subpaths.length;
 	let pathSoFar = "";
 	for (const subpath of subpaths) {
 		pathSoFar += subpath + "/";
 		const thisPath = pathSoFar; // To ensure this is captured!
 		
+		subpathsRemaining--;
+		const lastPart = subpathsRemaining === 0 && isDirectory;
+		
 		parts.push(
 			<BreadcrumbEntry
 				name={subpath}
 				key={key++}
-				onClick={() => onClick(thisPath)}
+				onClick={() => lastPart ? null : onClick(thisPath)}
 			/>
 		);
 		parts.push(
@@ -86,7 +90,6 @@ const BreadcrumbBar = ({path, isDirectory, onClick}) => {
 			<BreadcrumbEntry
 				name={lastSubpath}
 				key={key++}
-				onClick={() => onClick(path)}
 			/>
 		);
 	}

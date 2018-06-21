@@ -86,9 +86,7 @@ let Root = ({path, uiMode, menuVisible, qthHost,
 			<AppBarElement>
 				<BreadcrumbBar path={path}
 				               isDirectory={uiMode === "DIRECTORY"}
-				               onClick={newPath => (path !== newPath)
-				                         ? showDirectory(newPath)
-				                         : null} />
+				               onClick={showDirectory} />
 			</AppBarElement>
 		</AppBar>
 		
