@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import {createStore, applyMiddleware} from "redux";
 import ReduxThunk from "redux-thunk";
 import {Provider, connect} from "react-redux";
-import reducer, {qthActions, uiActions} from "./store/index.js";
+import reducer, {qthActions, uiActions, lockStateAndUrl} from "./store/index.js";
 
 import "./index.less";
 
@@ -116,8 +116,15 @@ Root = connect(
 )(Root);
 
 const store = createStore(reducer, applyMiddleware(ReduxThunk));
-store.dispatch(qthActions.connect("ws://server:8080/"));
-store.dispatch(uiActions.showDirectory(""));
+lockStateAndUrl(store);
+store.subscribe(() => {
+	let path = store.getState().ui.path;
+	if (path === "") {
+		document.title = "Qth";
+	} else {
+		document.title = `${path} - Qth`;
+	}
+});
 
 ReactDOM.render(
 	<Provider store={store}>

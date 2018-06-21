@@ -2,6 +2,7 @@ import {combineReducers} from "redux";
 
 import qth from "./qth";
 import * as qthActions from "./qth";
+import lockStateAndUrl from "./url";
 
 import ui from "./ui";
 import * as uiActions from "./ui";
@@ -12,4 +13,4 @@ const reducer = combineReducers({
 });
 
 export default reducer;
-export {qthActions, uiActions};
+export {qthActions, uiActions, lockStateAndUrl};
