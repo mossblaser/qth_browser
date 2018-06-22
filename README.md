@@ -1,7 +1,7 @@
 Qth Browser
 ===========
 
-A web based, graphical browser for [Qth](https://github.com/mossblaser/qth).
+A graphical, web-based browser for [Qth](https://github.com/mossblaser/qth).
 
 ![A directory listing in Qth Browser](./screenshots/directory_listing.png)
 ![A value listing in Qth Browser](./screenshots/value_listing.png)
