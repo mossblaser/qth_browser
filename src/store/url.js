@@ -2,20 +2,18 @@
  * Track the principal parts of the GUI's state in the URL.
  */
 
-import * as qthActions from "./qth";
 import * as uiActions from "./ui";
 
 /**
  * Convert a redux state into a URL.
  */
 const stateToUrl = (state) => {
-	const host = encodeURIComponent(state.qth.host);
 	const type = state.ui.mode.toLowerCase();
 	const path = encodeURI(state.ui.path);
-	return `#${host}?${type}=${path}`;
+	return `#${type}=${path}`;
 };
 
-const urlRegex = /#([-A-Za-z0-9_.!~*'()%]*)[?](value|directory)=(.*)/;
+const urlRegex = /#(value|directory)=(.*)/;
 
 /**
  * Convert a URL into an array of redux actions which will transform the state
@@ -27,20 +25,10 @@ const urlToActions = (state, url) => {
 		return null;
 	}
 	
-	const [_, encodedHost, type, encodedPath] = match;
-	let host = decodeURIComponent(encodedHost);
+	const [_, type, encodedPath] = match;
 	let path = decodeURI(encodedPath);
 	
 	const actions = [];
-	
-	// Special case: URL cannot represent 'null' value.
-	if (host === "null") {
-		host = null;
-	}
-	
-	if (host != state.qth.host) {
-		actions.push(qthActions.connect(host));
-	}
 	
 	if (type != state.ui.mode.toLowerCase() || path != state.ui.path) {
 		if (type === "value") {
@@ -92,71 +80,24 @@ const updateStateToMatchURL = (store) => {
 }
 
 /**
- * Store the current host in a cookie.
- */
-const updateCookie = (host) => {
-	if (host !== null) {
-		document.cookie = `qthHost=${encodeURIComponent(host)}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
-	} else {
-		// Delete cookie to represent 'null'
-		document.cookie = "qthHost=; max-age=0";
-	}
-}
-
-const cookieRegex = /(?:^|;)qthHost=([^;]*)(?:;|$)/;
-
-/**
- * Load the host from a cookie (if available).
- */
-const readCookie = () => {
-	const match = cookieRegex.exec(document.cookie);
-	if (match) {
-		const host = decodeURIComponent(match[1]);
-		return host;
-	} else {
-		return null;
-	}
-}
-
-/**
  * Lock the hash-part of the page URL to the most important parts of the state.
  * Specifically, URLs will be produced with the following format:
  *
- *     ...#<server-name>?<type>=<path>
+ *     ...#<type>=<path>
  *
- * Where `<server-name>` is the websocket URL for the Qth server, URI-Component
- * Encoded, `<type>` is one of 'value' or 'directory' and <path> is the Qth
- * path, URI-encoded (not URI-Component encoded).
+ * Where `<type>` is one of 'value' or 'directory' and <path> is the Qth path,
+ * URI-encoded (not URI-Component encoded).
  *
  * If the state changes,the URL will be modified to match, pushing the state
  * into the browser history. If the URL changes, the state will be updated to
  * match.
- *
- * Finally, the server name is recorded in a cookie whenever it changes in the
- * state. When lockStateAndUrl is first called, if no URL is provided, the
- * cookie is used to set the Qth host. If the cookie is not set, the Qth host
- * is not set either.
  */
 const lockStateAndUrl = (store) => {
 	// Update the URL when state changes
 	store.subscribe(() => updateURLToMatchState(store));
 	
-	// Update the cookie too!
-	store.subscribe(() => updateCookie(store.getState().qth.host));
-	
-	// Update state in response to URL change
+	// Update state in response to URL changes
 	window.addEventListener("hashchange", () => updateStateToMatchURL(store));
-	
-	// Initially go where the URL tells us, unless the URL is empty in which case
-	// load from a cookie.
-	if (window.location.hash && window.location.hash.length > 1) {
-		updateStateToMatchURL(store);
-	} else {
-		const cookieHost = readCookie();
-		if (cookieHost !== null) {
-			store.dispatch(qthActions.connect(cookieHost));
-		}
-	}
 }
 
 export default lockStateAndUrl;

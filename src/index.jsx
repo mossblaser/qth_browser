@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import {createStore, applyMiddleware} from "redux";
 import ReduxThunk from "redux-thunk";
 import {Provider, connect} from "react-redux";
-import reducer, {qthActions, uiActions, lockStateAndUrl} from "./store/index.js";
+import reducer, {qthActions, uiActions, lockStateAndUrl, lockStateAndCookie} from "./store/index.js";
 
 import "./index.less";
 
@@ -125,6 +125,9 @@ Root = connect(
 
 const store = createStore(reducer, applyMiddleware(ReduxThunk));
 lockStateAndUrl(store);
+lockStateAndCookie(store);
+
+// Set the window title to match the current state
 store.subscribe(() => {
 	let path = store.getState().ui.path;
 	if (path === "") {
