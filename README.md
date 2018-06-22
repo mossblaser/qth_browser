@@ -1,7 +1,10 @@
 Qth Browser
 ===========
 
-A web based graphical browser for [Qth](https://github.com/mossblaser/qth).
+A web based, graphical browser for [Qth](https://github.com/mossblaser/qth).
+
+![A directory listing in Qth Browser](./screenshots/directory_listing.png)
+![A value listing in Qth Browser](./screenshots/value_listing.png)
 
 This application is intended as a low-level tool rather than a general purpose
 front end for home automation control. It provides a uniform, file-browser like
@@ -43,6 +46,10 @@ Mosquitto](http://www.steves-internet-guide.com/mqtt-websockets/) by hand.
 Finally, you must also be running a [Qth
 Registrar](https://github.com/mossblaser/qth_registrar) otherwise Qth Browser
 won't be very helpful.
+
+Qth Browser is a completely static HTML and Javascript application and can be
+hosted by any old web server. It also includes a web app manifest meaning that
+you can add it to your mobile device's home screen like an app.
 
 
 Running the tests
