@@ -29,7 +29,14 @@ import {
  */
 export const connect = url => (dispatch, getState) => {
   const setupNewClient = () => {
-    const client = new Client(url);
+    let client;
+    try {
+      client = new Client(url);
+    } catch(err) {
+      dispatch(connecting(url, null));
+      console.error(err);
+      return;
+    }
     
     // Subscribe to state change notifications
     client.on("connect", () => dispatch(connected()));
