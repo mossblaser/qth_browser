@@ -28,10 +28,15 @@ const urlToActions = (state, url) => {
 	}
 	
 	const [_, encodedHost, type, encodedPath] = match;
-	const host = decodeURIComponent(encodedHost);
+	let host = decodeURIComponent(encodedHost);
 	let path = decodeURI(encodedPath);
 	
 	const actions = [];
+	
+	// Special case: URL cannot represent 'null' value.
+	if (host === "null") {
+		host = null;
+	}
 	
 	if (host != state.qth.host) {
 		actions.push(qthActions.connect(host));
@@ -91,7 +96,10 @@ const updateStateToMatchURL = (store) => {
  */
 const updateCookie = (host) => {
 	if (host !== null) {
-		document.cookie = `qthHost=${encodeURIComponent(host)}; expires=Fri, 31 Dec 9999 23:59:59 GMT`
+		document.cookie = `qthHost=${encodeURIComponent(host)}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+	} else {
+		// Delete cookie
+		document.cookie = "qthHost=; max-age=0";
 	}
 }
 

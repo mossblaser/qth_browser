@@ -12,6 +12,8 @@ import {AppBar, AppBarElement, AppBarButton} from "./presentation/AppBar/index.j
 import {OverlayMenu, OverlayMenuHeader, OverlayMenuEntry} from "./presentation/OverlayMenu/index.jsx";
 import BreadcrumbBar from "./presentation/BreadcrumbBar/index.jsx";
 import EnterLeaveAnimation from "./presentation/EnterLeaveAnimation/index.jsx";
+import ErrorMessage from "./presentation/ErrorMessage/index.jsx";
+import Button from "./presentation/Button/index.jsx";
 
 import DirectoryListing from "./container/DirectoryListing/index.jsx";
 import ValueListing from "./container/ValueListing/index.jsx";
@@ -22,23 +24,6 @@ import MdMenu from "react-icons/lib/md/menu";
 let Root = ({path, uiMode, menuVisible, qthHost,
              showMenu, hideMenu, showDirectory, showValue, hierarchyDirection,
              connect}) => {
-	let body;
-	if (uiMode == "DIRECTORY") {
-		body = <DirectoryListing
-			key={path}
-			path={path}
-			onValueClick={showValue}
-			onDirectoryClick={showDirectory}
-		/>;
-	} else if (uiMode == "VALUE") {
-		body = <ValueListing
-			key={path}
-			path={path}
-			onValueClick={showValue}
-			onDirectoryClick={showDirectory}
-		/>;
-	}
-	
 	const connectToServerClicked = () => {
 		const host = prompt("Enter server Websocket URL", qthHost || "ws://");
 		if (host !== null) {
@@ -67,6 +52,29 @@ let Root = ({path, uiMode, menuVisible, qthHost,
 			showValue(selectedPath);
 		}
 	};
+	
+	let body;
+	if (qthHost === null) {
+		body = <ErrorMessage>
+			<p>No Qth host selected.</p>
+			<Button onClick={connectToServerClicked}>Connect</Button>
+		</ErrorMessage>;
+	} else if (uiMode == "DIRECTORY") {
+		body = <DirectoryListing
+			key={path}
+			path={path}
+			onValueClick={showValue}
+			onDirectoryClick={showDirectory}
+		/>;
+	} else if (uiMode == "VALUE") {
+		body = <ValueListing
+			key={path}
+			path={path}
+			onValueClick={showValue}
+			onDirectoryClick={showDirectory}
+		/>;
+	}
+	
 	
 	return <div className="Root">
 		<OverlayMenu
