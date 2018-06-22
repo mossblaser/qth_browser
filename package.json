@@ -4,6 +4,8 @@
   "description": "A graphical, web-based browser for Qth.",
   "main": "src/index.js",
   "scripts": {
+    "build": "webpack",
+    "serve": "http-server -c-1 dist/",
     "test": "jest"
   },
   "keywords": [
@@ -40,6 +42,7 @@
   "devDependencies": {
     "babel-jest": "^22.4.3",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "http-server": "^0.11.1",
     "webpack-cli": "^2.1.3"
   }
 }

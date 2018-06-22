@@ -1,3 +1,7 @@
+/**
+ * A graphical Qth browser.
+ */
+
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 
@@ -19,7 +23,6 @@ import DirectoryListing from "./container/DirectoryListing/index.jsx";
 import ValueListing from "./container/ValueListing/index.jsx";
 
 import MdMenu from "react-icons/lib/md/menu";
-
 
 let Root = ({path, uiMode, menuVisible, qthHost,
              showMenu, hideMenu, showDirectory, showValue, hierarchyDirection,
