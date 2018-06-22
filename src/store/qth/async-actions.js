@@ -33,7 +33,8 @@ export const connect = url => (dispatch, getState) => {
     try {
       client = new Client(url);
     } catch(err) {
-      dispatch(connecting(url, null));
+      // NB: Throws away the URL if this crashes (i.e. the URL isn't valid)
+      dispatch(connecting(null, null));
       console.error(err);
       return;
     }

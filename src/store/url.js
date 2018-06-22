@@ -15,7 +15,7 @@ const stateToUrl = (state) => {
 	return `#${host}?${type}=${path}`;
 };
 
-const urlRegex = /#([-A-Za-z0-9_.!~*'()%]+)[?](value|directory)=(.*)/;
+const urlRegex = /#([-A-Za-z0-9_.!~*'()%]*)[?](value|directory)=(.*)/;
 
 /**
  * Convert a URL into an array of redux actions which will transform the state
@@ -98,12 +98,12 @@ const updateCookie = (host) => {
 	if (host !== null) {
 		document.cookie = `qthHost=${encodeURIComponent(host)}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
 	} else {
-		// Delete cookie
+		// Delete cookie to represent 'null'
 		document.cookie = "qthHost=; max-age=0";
 	}
 }
 
-const cookieRegex = /(?:^|;)qthHost=([^;]+)(?:;|$)/;
+const cookieRegex = /(?:^|;)qthHost=([^;]*)(?:;|$)/;
 
 /**
  * Load the host from a cookie (if available).
@@ -153,7 +153,7 @@ const lockStateAndUrl = (store) => {
 		updateStateToMatchURL(store);
 	} else {
 		const cookieHost = readCookie();
-		if (cookieHost) {
+		if (cookieHost !== null) {
 			store.dispatch(qthActions.connect(cookieHost));
 		}
 	}

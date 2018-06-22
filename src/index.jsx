@@ -23,7 +23,7 @@ import MdMenu from "react-icons/lib/md/menu";
 
 let Root = ({path, uiMode, menuVisible, qthHost,
              showMenu, hideMenu, showDirectory, showValue, hierarchyDirection,
-             connect}) => {
+             connect, disconnect}) => {
 	const connectToServerClicked = () => {
 		const host = prompt("Enter server Websocket URL", qthHost || "ws://");
 		if (host !== null) {
@@ -83,6 +83,7 @@ let Root = ({path, uiMode, menuVisible, qthHost,
 		>
 			<OverlayMenuHeader onClick={hideMenu}>Qth</OverlayMenuHeader>
 			<OverlayMenuEntry onClick={connectToServerClicked}>Connect to server</OverlayMenuEntry>
+			<OverlayMenuEntry onClick={disconnect}>Disconnect</OverlayMenuEntry>
 			<OverlayMenuEntry onClick={goToDirectoryClicked}>Go to directory</OverlayMenuEntry>
 			<OverlayMenuEntry onClick={goToValueClicked}>Go to value</OverlayMenuEntry>
 		</OverlayMenu>
@@ -118,6 +119,7 @@ Root = connect(
 		showDirectory: path => dispatch(uiActions.showDirectory(path)),
 		showValue: path => dispatch(uiActions.showValue(path)),
 		connect: (host) => dispatch(qthActions.connect(host)),
+		disconnect: (host) => dispatch(qthActions.connect(null)),
 	}),
 )(Root);
 
