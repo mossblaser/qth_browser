@@ -41,6 +41,8 @@ const lockStateAndCookie = (store) => {
 	if (cookieHost !== null) {
 		store.dispatch(qthActions.connect(cookieHost));
 	}
+	
+	store.subscribe(() => updateCookie(store.getState().qth.host));
 };
 
 export default lockStateAndCookie;
