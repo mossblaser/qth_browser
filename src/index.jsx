@@ -28,7 +28,12 @@ let Root = ({path, uiMode, menuVisible, qthHost,
              showMenu, hideMenu, showDirectory, showValue, hierarchyDirection,
              connect, disconnect}) => {
 	const connectToServerClicked = () => {
-		const host = prompt("Enter server Websocket URL", qthHost || "ws://");
+		const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+		const wsHost = window.location.host;
+		const wsPathname = window.location.pathname.replace(/[^\/]*$/, "ws");
+		const defaultWsUrl = `${wsProtocol}//${wsHost}${wsPathname}`;
+		
+		const host = prompt("Enter server Websocket URL", qthHost || defaultWsUrl);
 		if (host !== null) {
 			connect(host);
 		}
