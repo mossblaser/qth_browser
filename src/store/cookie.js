@@ -9,10 +9,10 @@ import * as qthActions from "./qth";
  */
 const updateCookie = (host) => {
 	if (host !== null) {
-		document.cookie = `qthHost=${encodeURIComponent(host)}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+		document.cookie = `qthHost=${encodeURIComponent(host)}; expires=Fri, 31 Dec 9999 23:59:59 GMT; secure`;
 	} else {
 		// Delete cookie to represent 'null'
-		document.cookie = "qthHost=; max-age=0";
+		document.cookie = "qthHost=; max-age=0; secure";
 	}
 }
 

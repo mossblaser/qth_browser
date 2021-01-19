@@ -22,7 +22,8 @@ import Button from "./presentation/Button/index.jsx";
 import DirectoryListing from "./container/DirectoryListing/index.jsx";
 import ValueListing from "./container/ValueListing/index.jsx";
 
-import MdMenu from "react-icons/lib/md/menu";
+import { IconContext } from "react-icons";
+import { MdMenu } from "react-icons/md";
 
 let Root = ({path, uiMode, menuVisible, qthHost,
              showMenu, hideMenu, showDirectory, showValue, hierarchyDirection,
@@ -146,8 +147,10 @@ store.subscribe(() => {
 });
 
 ReactDOM.render(
-	<Provider store={store}>
-		<Root />
-	</Provider>,
+	<IconContext.Provider value={{ style: { verticalAlign: 'middle' } }}>
+		<Provider store={store}>
+			<Root />
+		</Provider>
+	</IconContext.Provider>,
 	document.getElementById("root")
 );

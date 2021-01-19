@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import MdWarning from "react-icons/lib/md/warning";
+import { MdWarning } from "react-icons/md";
 
 import "./WarningBar.less";
 

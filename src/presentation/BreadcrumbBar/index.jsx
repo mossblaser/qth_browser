@@ -5,7 +5,7 @@ import {allPathParts} from "../../qth_utils.js";
 import ClickAnimation from "../ClickAnimation/index.jsx";
 import KeypressToClick from "../KeypressToClick/index.jsx";
 
-import GoPrimitiveDot from "react-icons/lib/go/primitive-dot";
+import { GoPrimitiveDot } from "react-icons/go";
 
 import "./BreadcrumbBar.less";
 

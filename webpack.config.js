@@ -1,5 +1,7 @@
 const path = require("path");
 
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+
 module.exports = {
   entry: ["babel-polyfill", "./src/index.jsx"],
   mode: "development",
@@ -15,7 +17,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env'],
+            presets: ['@babel/preset-env'],
           },
         },
       },
@@ -25,7 +27,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env', 'react'],
+            presets: ['@babel/preset-env', '@babel/preset-react'],
           },
         },
       },
@@ -39,4 +41,7 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new NodePolyfillPlugin()
+	]
 };

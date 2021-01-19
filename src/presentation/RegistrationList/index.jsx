@@ -11,7 +11,7 @@ import {
 } from "../../presentation/List/index.jsx";
 
 import QthValueIcon from "../../presentation/QthValueIcon/index.jsx";
-import MdNavigateNext from "react-icons/lib/md/navigate-next";
+import { MdNavigateNext } from "react-icons/md";
 
 const BehaviourScore = behaviour => {
 	switch (behaviour) {

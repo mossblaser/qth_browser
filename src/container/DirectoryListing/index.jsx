@@ -19,8 +19,8 @@ import LoadingArea from "../../presentation/LoadingArea/index.jsx";
 import ErrorMessage from "../../presentation/ErrorMessage/index.jsx";
 import QthValueIcon from "../../presentation/QthValueIcon/index.jsx";
 
-import MdNavigateNext from "react-icons/lib/md/navigate-next";
-import GoPrimitiveDot from "react-icons/lib/go/primitive-dot";
+import { MdNavigateNext } from "react-icons/md";
+import { GoPrimitiveDot } from "react-icons/go";
 
 import {
 	containsProperty,

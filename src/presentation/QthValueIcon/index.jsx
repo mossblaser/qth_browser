@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import MdFolder from "react-icons/lib/md/folder";
+import { MdFolder } from "react-icons/md";
 
 const QthValueIcon = ({behaviour, ...props}) => {
 	switch (behaviour) {

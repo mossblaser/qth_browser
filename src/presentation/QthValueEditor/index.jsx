@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import MdEdit from "react-icons/lib/md/edit";
-import MdDelete from "react-icons/lib/md/delete";
+import { MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 
 import {
 	InlineToolbar,

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import MdError from "react-icons/lib/md/error";
+import { MdError } from "react-icons/md";
 
 import "./ErrorMessage.less";
 
